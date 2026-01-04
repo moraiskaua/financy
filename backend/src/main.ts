@@ -5,11 +5,13 @@ import 'dotenv/config';
 import { typeDefs } from './graphql/typeDefs';
 import { resolvers } from './graphql/resolvers';
 import { Context } from './types/context';
+import { formatError } from './utils/error-handler';
 
 async function bootstrap() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+    formatError: (formattedError, error) => formatError(formattedError, error),
   });
 
   const { url } = await startStandaloneServer(server, {
