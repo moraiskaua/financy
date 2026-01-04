@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { CreateTransactionInput } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import { cn } from '@/utils/cn';
 import type { useTransactionsPageModel } from './use-transactions-page.model';
 
@@ -40,6 +41,16 @@ export function TransactionsView({
     }
   };
 
+  const typeOptions = [
+    { value: 'EXPENSE', label: 'Expense' },
+    { value: 'INCOME', label: 'Income' },
+  ];
+
+  const categoryOptions = categories.map((cat) => ({
+    value: cat.id,
+    label: cat.name,
+  }));
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6 text-gray-900">Transactions</h1>
@@ -68,28 +79,20 @@ export function TransactionsView({
             disabled={isLoading}
             step="0.01"
           />
-          <select
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          <Select
+            options={typeOptions}
             value={type}
-            onChange={(e) => setType(e.target.value)}
+            onChange={(val) => setType(val)}
             disabled={isLoading}
-          >
-            <option value="EXPENSE">Expense</option>
-            <option value="INCOME">Income</option>
-          </select>
-          <select
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            placeholder="Type"
+          />
+          <Select
+            options={categoryOptions}
             value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
+            onChange={(val) => setCategoryId(val)}
             disabled={isLoading}
-          >
-            <option value="" disabled>Category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+            placeholder="Category"
+          />
           <Button type="submit" disabled={isLoading || !description || !amount || !categoryId} className="lg:col-span-5">
             {isLoading ? 'Creating...' : 'Add Transaction'}
           </Button>
