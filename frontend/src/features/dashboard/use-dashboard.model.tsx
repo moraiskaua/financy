@@ -71,8 +71,8 @@ export const useDashboardModel = () => {
   }, [transactions, currentMonth, currentYear]);
 
   const recentTransactions = useMemo(() => {
-    return transactions
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    const sorted = [...transactions].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return sorted
       .slice(0, RECENT_TRANSACTIONS_LIMIT)
       .map((transaction) => {
         const category = categories.find(c => c.id === transaction.categoryId);

@@ -98,6 +98,10 @@ export const categoryResolvers = {
         });
       }
 
+      await prisma.transaction.deleteMany({
+        where: { categoryId: id, userId },
+      });
+
       await prisma.category.delete({
         where: { id },
       });

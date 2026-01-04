@@ -9,13 +9,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
+import { Tag } from '@/components/ui/tag';
 import type { Category } from '@/types';
 import { cn } from '@/utils/cn';
 import {
   ArrowUpDown,
   Edit2,
   Plus,
-  Tag,
+  Tag as TagIcon,
   Trash2,
   Utensils
 } from 'lucide-react';
@@ -83,7 +84,7 @@ export function CategoriesView({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
             <div className="p-3 bg-gray-50 rounded-lg">
-                <Tag className="w-6 h-6 text-gray-600" />
+                <TagIcon className="w-6 h-6 text-gray-600" />
             </div>
             <div>
                 <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
@@ -114,46 +115,63 @@ export function CategoriesView({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {categoriesWithIcons.map((category) => {
-            const iconColorClass = category.color ? `text-${category.color}-600` : 'text-blue-600';
-            const bgColorClass = category.color ? `bg-${category.color}-50` : 'bg-blue-50';
-            
+            const iconBgClasses: Record<string, string> = {
+              blue: 'bg-blue-light',
+              purple: 'bg-purple-light',
+              orange: 'bg-orange-light',
+              green: 'bg-green-light',
+              pink: 'bg-pink-light',
+              yellow: 'bg-yellow-light',
+              red: 'bg-red-light',
+              gray: 'bg-gray-200',
+            };
+            const iconColorClasses: Record<string, string> = {
+              blue: 'text-blue-base',
+              purple: 'text-purple-base',
+              orange: 'text-orange-base',
+              green: 'text-green-base',
+              pink: 'text-pink-base',
+              yellow: 'text-yellow-base',
+              red: 'text-red-base',
+              gray: 'text-gray-600',
+            };
+            const color = category.color || 'blue';
+            const bgColorClass = iconBgClasses[color] || iconBgClasses.blue;
+            const iconColorClass = iconColorClasses[color] || iconColorClasses.blue;
             return (
-                <div key={category.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className={cn("p-3 rounded-lg", bgColorClass, iconColorClass)}>
-                            <category.Icon className="w-6 h-6" />
-                        </div>
-                        <div className="flex gap-2">
-                            <button 
-                                onClick={() => handleDeleteClick(category.id)}
-                                className="p-2 text-red-400 hover:bg-red-50 rounded-lg transition-colors"
-                                disabled={isLoading}
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </button>
-                            <button 
-                                onClick={() => handleEditClick(category)}
-                                className="p-2 text-gray-400 hover:bg-gray-50 rounded-lg transition-colors"
-                                disabled={isLoading}
-                            >
-                                <Edit2 className="w-4 h-4" />
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <h3 className="font-bold text-gray-900 mb-1">{category.name}</h3>
-                    
-                    <div className="flex justify-between items-center mt-4">
-                        <span className={cn("px-3 py-1 text-xs font-medium rounded-full", bgColorClass, iconColorClass)}>
-                            {category.name}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                            {category.count} {category.count === 1 ? 'item' : 'itens'}
-                        </span>
-                    </div>
+              <div key={category.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start mb-4">
+                  <div className={cn("p-3 rounded-lg", bgColorClass, iconColorClass)}>
+                    <category.Icon className="w-6 h-6" />
+                  </div>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => handleDeleteClick(category.id)}
+                      className="p-2 text-red-400 hover:bg-red-light rounded-lg transition-colors"
+                      disabled={isLoading}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => handleEditClick(category)}
+                      className="p-2 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors"
+                      disabled={isLoading}
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
+                <h3 className="font-bold text-gray-900 mb-1">{category.name}</h3>
+                <p className="text-sm text-gray-600">{category.description || ''}</p>
+                <div className="flex justify-between items-center mt-4">
+                  <Tag variant={color}>{category.name}</Tag>
+                  <span className="text-xs text-gray-500">
+                    {category.count} {category.count === 1 ? 'item' : 'itens'}
+                  </span>
+                </div>
+              </div>
             );
-        })}
+          })}
         
         {categories.length === 0 && !isLoading && (
             <div className="col-span-full text-center py-12 text-gray-500">
@@ -175,20 +193,17 @@ export function CategoriesView({
         onSuccess={() => setEditingCategory(null)}
       />
 
-      <AlertDialog open={!!deleteConfirmationId} onOpenChange={(open) => !open && setDeleteConfirmationId(null)}>
-        <AlertDialogContent>
+      <AlertDialog open={!!deleteConfirmationId} onOpenChange={(open: boolean) => !open && setDeleteConfirmationId(null)}>
+        <AlertDialogContent className="p-0 overflow-hidden bg-white">
           <AlertDialogHeader>
-            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+            <AlertDialogTitle>Excluir categoria</AlertDialogTitle>
             <AlertDialogDescription>
-              Essa ação não pode ser desfeita. Isso excluirá permanentemente a categoria
-              e removerá os dados de nossos servidores.
+              Esta ação não pode ser desfeita. Tem certeza que deseja excluir esta categoria?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700 text-white">
-              Sim, excluir
-            </AlertDialogAction>
+            <AlertDialogAction variant="danger" onClick={confirmDelete}>Excluir</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

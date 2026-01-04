@@ -35,12 +35,7 @@ export const useTransactionsPageModel = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('');
   const [filterCategory, setFilterCategory] = useState<string>('');
-  const [filterPeriod, setFilterPeriod] = useState<string>(() => {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    return `${y}-${m}`;
-  });
+  const [filterPeriod, setFilterPeriod] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -74,7 +69,7 @@ export const useTransactionsPageModel = () => {
 
   const periodOptions = useMemo(() => {
     const now = new Date();
-    const res: { value: string; label: string }[] = [];
+    const res: { value: string; label: string }[] = [{ value: '', label: 'Todos' }];
     const months = [
       'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
       'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'

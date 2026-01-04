@@ -7,7 +7,7 @@ import { useMemo, useState } from 'react';
 
 export const useCategoriesModel = () => {
   const { data, loading: isLoadingCategories, refetch } = useQuery<{ categories: Category[] }>(GET_CATEGORIES);
-  const { data: transactionsData, loading: isLoadingTransactions } = useQuery<{ transactions: Transaction[] }>(GET_TRANSACTIONS);
+  const { data: transactionsData, loading: isLoadingTransactions, refetch: transactionsRefetch } = useQuery<{ transactions: Transaction[] }>(GET_TRANSACTIONS);
   
   const [createMutation] = useMutation(CREATE_CATEGORY);
   const [updateMutation] = useMutation(UPDATE_CATEGORY);
@@ -65,6 +65,7 @@ export const useCategoriesModel = () => {
         variables: { input },
       });
       await refetch();
+      await transactionsRefetch();
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Falha ao criar categoria');
@@ -82,6 +83,7 @@ export const useCategoriesModel = () => {
         variables: { id, input },
       });
       await refetch();
+      await transactionsRefetch();
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Falha ao atualizar categoria');
@@ -99,6 +101,7 @@ export const useCategoriesModel = () => {
         variables: { id },
       });
       await refetch();
+      await transactionsRefetch();
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Falha ao excluir categoria');

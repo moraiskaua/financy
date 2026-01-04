@@ -22,9 +22,7 @@ import {
   Edit,
   Plus,
   Search,
-  Trash2,
-  TrendingDown,
-  TrendingUp,
+  Trash2
 } from 'lucide-react';
 import { CreateTransactionDialog } from './components/create-transaction-dialog';
 import type { useTransactionsPageModel } from './use-transactions-page.model';
@@ -207,23 +205,16 @@ export function TransactionsView({
                       <Type type={transaction.type as 'entrada' | 'saida'} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {transaction.type === 'entrada' ? (
-                          <TrendingUp className="w-4 h-4 text-success mr-1" />
-                        ) : (
-                          <TrendingDown className="w-4 h-4 text-danger mr-1" />
+                      <span
+                        className={cn(
+                          'text-sm font-medium',
+                          transaction.type === 'entrada'
+                            ? 'text-success'
+                            : 'text-danger'
                         )}
-                        <span
-                          className={cn(
-                            'text-sm font-medium',
-                            transaction.type === 'entrada'
-                              ? 'text-success'
-                              : 'text-danger'
-                          )}
-                        >
-                          {(transaction.type === 'entrada' ? '+' : '-') + ' ' + formatCurrency(transaction.amount)}
-                        </span>
-                      </div>
+                      >
+                        {(transaction.type === 'entrada' ? '+' : '-') + ' ' + formatCurrency(transaction.amount)}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
