@@ -1,29 +1,35 @@
-import { GraphQLError } from 'graphql';
+import { type GraphQLFormattedError } from 'graphql';
 
 export function formatError(
-  formattedError: GraphQLError,
+  formattedError: GraphQLFormattedError,
   error: any
-): GraphQLError {
-  if (formattedError.extensions?.code) {
-    return formattedError;
-  }
+): GraphQLFormattedError {
+  const base = {
+    message: formattedError.message,
+    locations: formattedError.locations,
+    path: formattedError.path,
+    extensions: formattedError.extensions ?? {},
+  };
 
   if (error?.message?.includes('Unique constraint failed')) {
-    return new GraphQLError('Este registro já existe.', {
-      extensions: { code: 'CONFLICT' },
-    });
+    return {
+      ...base,
+      message: 'Este registro já existe.',
+      extensions: { ...base.extensions, code: 'CONFLICT' },
+    };
   }
 
   if (error?.message?.includes('Unknown argument')) {
-    return new GraphQLError('Erro interno no servidor.', {
-      extensions: { code: 'INTERNAL_SERVER_ERROR' },
-    });
+    return {
+      ...base,
+      message: 'Erro interno no servidor.',
+      extensions: { ...base.extensions, code: 'INTERNAL_SERVER_ERROR' },
+    };
   }
 
-  return new GraphQLError(
-    'Ocorreu um erro interno. Tente novamente mais tarde.',
-    {
-      extensions: { code: 'INTERNAL_SERVER_ERROR' },
-    }
-  );
+  return {
+    ...base,
+    message: 'Ocorreu um erro interno. Tente novamente mais tarde.',
+    extensions: { ...base.extensions, code: 'INTERNAL_SERVER_ERROR' },
+  };
 }

@@ -8,7 +8,6 @@ import {
 } from '@/utils/transaction-helpers';
 import { useQuery } from '@apollo/client/react';
 import { useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 
 const RECENT_TRANSACTIONS_LIMIT = 5;
 const CATEGORIES_WITH_STATS_LIMIT = 5;
@@ -34,7 +33,6 @@ const iconColorClasses: Record<string, string> = {
 };
 
 export const useDashboardModel = () => {
-  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const { data: userData, loading: userLoading, error: userError } = useQuery<{ me: User }>(ME_QUERY);
@@ -104,12 +102,6 @@ export const useDashboardModel = () => {
       .slice(0, CATEGORIES_WITH_STATS_LIMIT);
   }, [categories, transactions]);
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    window.location.href = '/login';
-  };
-
-  const isLoading = userLoading || transactionsLoading || categoriesLoading;
   const error = userError ? userError.message : null;
 
   const userInitials = useMemo(() => {

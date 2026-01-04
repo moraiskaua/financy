@@ -1,8 +1,8 @@
+import { User } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { prisma } from '../../config/database';
-import { hashPassword, comparePassword, generateToken, getUserIdFromContext } from '../../utils/auth';
-import { Context, RegisterInput, LoginInput, AuthPayload } from '../../types/context';
-import { User } from '@prisma/client';
+import { AuthPayload, Context, LoginInput, RegisterInput, UpdateUserInput } from '../../types/context';
+import { comparePassword, generateToken, getUserIdFromContext, hashPassword } from '../../utils/auth';
 
 export const authResolvers = {
   Query: {
@@ -74,6 +74,28 @@ export const authResolvers = {
       const token = generateToken(user.id);
 
       return { token, user };
+    },
+    updateUser: async (_: unknown, { input }: { input: UpdateUserInput }, context: Context): Promise<User> => {
+      const userId = getUserIdFromContext(context);
+
+      const existingUser = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!existingUser) {
+        throw new GraphQLError('User not found', {
+          extensions: { code: 'NOT_FOUND' },
+        });
+      }
+
+      const updated = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          name: input.name ?? undefined,
+        },
+      });
+
+      return updated;
     },
   },
 };

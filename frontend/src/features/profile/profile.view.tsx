@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, LogOut } from 'lucide-react';
+import { Loader2, LogOut, Mail, User as UserIcon } from 'lucide-react';
 import type { useProfileModel } from './use-profile.model';
 
 type ProfileViewProps = ReturnType<typeof useProfileModel>;
@@ -35,34 +35,26 @@ export function ProfileView({
         <p className="text-sm text-gray-500 mb-8">{user?.email}</p>
 
         <div className="space-y-4 text-left">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nome completo
-            </label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="bg-white"
-            />
-          </div>
+          <Input
+            label="Nome completo"
+            icon={UserIcon}
+            value={name || user?.name || ''}
+            onChange={(e) => setName(e.target.value)}
+            className="bg-white"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              E-mail
-            </label>
-            <Input
-              value={user?.email || ''}
-              disabled
-              className="bg-gray-50 text-gray-500"
-            />
-            <p className="text-xs text-gray-400 mt-1">
-              O e-mail não pode ser alterado
-            </p>
-          </div>
+          <Input
+            label="E-mail"
+            icon={Mail}
+            value={user?.email || ''}
+            disabled
+            helper="O e-mail não pode ser alterado"
+          />
 
           <div className="pt-4 space-y-3">
             <Button
-              className="w-full bg-green-700 hover:bg-green-800 text-white"
+              variant="primary"
+              className="w-full"
               onClick={handleSave}
               disabled={isLoading}
             >
@@ -71,10 +63,10 @@ export function ProfileView({
 
             <Button
               variant="ghost"
-              className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-red-600 group"
+              icon={LogOut}
+              className="w-full border-gray-200 text-red-600 hover:text-red-700"
               onClick={handleLogout}
             >
-              <LogOut className="w-4 h-4 mr-2 group-hover:text-red-600 transition-colors" />
               Sair da conta
             </Button>
           </div>

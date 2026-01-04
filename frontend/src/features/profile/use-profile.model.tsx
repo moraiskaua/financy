@@ -2,11 +2,9 @@ import { ME_QUERY, UPDATE_USER_MUTATION } from '@/graphql/auth.queries';
 import type { User } from '@/types';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 export function useProfileModel() {
-  const navigate = useNavigate();
-  const { data, loading, error } = useQuery<{ me: User }>(ME_QUERY);
+  const { data, loading } = useQuery<{ me: User }>(ME_QUERY);
   const [updateUser, { loading: isUpdating }] = useMutation(UPDATE_USER_MUTATION);
 
   const [name, setName] = useState('');
@@ -26,12 +24,11 @@ export function useProfileModel() {
       await updateUser({
         variables: {
           input: {
-            name,
+            name: name || user?.name || '',
           },
         },
         refetchQueries: [{ query: ME_QUERY }],
       });
-      // Optional: Add success toast/notification here
     } catch (err) {
       console.error('Failed to update profile:', err);
     }
