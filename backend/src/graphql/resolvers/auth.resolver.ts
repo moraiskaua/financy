@@ -1,28 +1,14 @@
 import { GraphQLError } from 'graphql';
 import { prisma } from '../../config/database';
-import { hashPassword, comparePassword, generateToken, verifyToken } from '../../utils/auth';
+import { hashPassword, comparePassword, generateToken, getUserIdFromContext } from '../../utils/auth';
 
 export const authResolvers = {
   Query: {
     me: async (_: any, __: any, context: any) => {
-      const token = context.token.replace('Bearer ', '');
-
-      if (!token) {
-        throw new GraphQLError('Not authenticated', {
-          extensions: { code: 'UNAUTHENTICATED' },
-        });
-      }
-
-      const payload = verifyToken(token);
-
-      if (!payload) {
-        throw new GraphQLError('Invalid token', {
-          extensions: { code: 'UNAUTHENTICATED' },
-        });
-      }
+      const userId = getUserIdFromContext(context);
 
       const user = await prisma.user.findUnique({
-        where: { id: payload.userId },
+        where: { id: userId },
       });
 
       if (!user) {
