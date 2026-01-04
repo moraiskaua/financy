@@ -1,33 +1,23 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import { Link } from '@/components/ui/link';
-import { loginSchema, type LoginFormData } from './login.schema';
+import { Eye, EyeOff, Lock, Mail, UserPlus } from 'lucide-react';
 import type { useLoginModel } from './use-login.model';
 import logo from '@/assets/logo.svg';
 
 type LoginViewProps = ReturnType<typeof useLoginModel>;
 
-export function LoginView({ isLoading, error, onSubmit }: LoginViewProps) {
-  const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  });
-
-  const handleFormSubmit = (data: LoginFormData) => {
-    onSubmit(data.email, data.password);
-  };
-
+export function LoginView({
+  isLoading,
+  error,
+  showPassword,
+  register,
+  errors,
+  handleSubmit,
+  togglePasswordVisibility,
+  navigateToRegister,
+}: LoginViewProps) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="mb-8">
@@ -43,7 +33,7 @@ export function LoginView({ isLoading, error, onSubmit }: LoginViewProps) {
           </p>
         </div>
 
-        <form className="space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
+        <form className="space-y-6" onSubmit={handleSubmit}>
           {error && (
             <div className="rounded-md bg-red-light p-4 border border-danger">
               <p className="text-sm text-danger">{error}</p>
@@ -69,7 +59,7 @@ export function LoginView({ isLoading, error, onSubmit }: LoginViewProps) {
               label="Senha"
               icon={Lock}
               rightIcon={showPassword ? EyeOff : Eye}
-              onRightIconClick={() => setShowPassword(!showPassword)}
+              onRightIconClick={togglePasswordVisibility}
               autoComplete="current-password"
               error={errors.password?.message}
               placeholder="Digite sua senha"
@@ -112,7 +102,7 @@ export function LoginView({ isLoading, error, onSubmit }: LoginViewProps) {
             size="md"
             icon={UserPlus}
             className="w-full"
-            onClick={() => navigate('/register')}
+            onClick={navigateToRegister}
           >
             Criar conta
           </Button>

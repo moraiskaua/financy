@@ -1,6 +1,7 @@
 import { CREATE_CATEGORY, DELETE_CATEGORY, GET_CATEGORIES, UPDATE_CATEGORY } from '@/graphql/categories.queries';
 import { GET_TRANSACTIONS } from '@/graphql/transactions.queries';
 import type { Category, CreateCategoryInput, Transaction, UpdateCategoryInput } from '@/types';
+import { getCategoryIcon } from '@/utils/transaction-helpers';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { useMemo, useState } from 'react';
 
@@ -22,7 +23,7 @@ export const useCategoriesModel = () => {
 
   const categories = data?.categories ?? [];
 
-  const { totalTransactions, mostUsedCategoryName, categoryCounts } = useMemo(() => {
+  const { totalTransactions, mostUsedCategoryName, categoryCounts, categoriesWithIcons } = useMemo(() => {
     const currentCategories = data?.categories ?? [];
     const currentTransactions = transactionsData?.transactions ?? [];
     
@@ -44,10 +45,17 @@ export const useCategoriesModel = () => {
 
     const mostUsed = currentCategories.find((c) => c.id === mostUsedId);
 
+    const mappedCategories = currentCategories.map((c) => ({
+      ...c,
+      Icon: getCategoryIcon(c.name),
+      count: counts[c.id] || 0,
+    }));
+
     return {
       totalTransactions: currentTransactions.length,
       mostUsedCategoryName: mostUsed?.name || 'Nenhuma',
       categoryCounts: counts,
+      categoriesWithIcons: mappedCategories,
     };
   }, [data?.categories, transactionsData?.transactions]);
 
@@ -124,7 +132,8 @@ export const useCategoriesModel = () => {
     setEditingName('');
   };
 
-  const onUpdateSubmit = async () => {
+  const onUpdateSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!editingId || !editingName.trim()) return;
     const success = await updateCategory(editingId, editingName);
     if (success) {
@@ -155,5 +164,6 @@ export const useCategoriesModel = () => {
     onCancelEditing,
     onUpdateSubmit,
     deleteCategory,
+    categoriesWithIcons,
   };
 };

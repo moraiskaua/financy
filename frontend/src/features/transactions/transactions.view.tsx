@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -14,14 +13,8 @@ import { PaginationButton } from '@/components/ui/pagination-button';
 import { Select } from '@/components/ui/select';
 import { Tag } from '@/components/ui/tag';
 import { Type } from '@/components/ui/type';
-import type { Transaction } from '@/types';
 import { cn } from '@/utils/cn';
-import {
-  formatCurrency,
-  formatDate,
-  getCategoryColor,
-  getCategoryIcon,
-} from '@/utils/transaction-helpers';
+import { formatCurrency, formatDate } from '@/utils/transaction-helpers';
 import {
   ChevronLeft,
   ChevronRight,
@@ -32,122 +25,46 @@ import {
   TrendingDown,
   TrendingUp,
 } from 'lucide-react';
-import { useState } from 'react';
 import type { useTransactionsPageModel } from './use-transactions-page.model';
 
 type TransactionsViewProps = ReturnType<typeof useTransactionsPageModel>;
 
-const iconBgClasses: Record<string, string> = {
-  blue: 'bg-blue-light',
-  purple: 'bg-purple-light',
-  orange: 'bg-orange-light',
-  green: 'bg-green-light',
-  pink: 'bg-pink-light',
-  yellow: 'bg-yellow-light',
-  gray: 'bg-gray-200',
-};
-
-const iconColorClasses: Record<string, string> = {
-  blue: 'text-blue-base',
-  purple: 'text-purple-base',
-  orange: 'text-orange-base',
-  green: 'text-green-base',
-  pink: 'text-pink-base',
-  yellow: 'text-yellow-base',
-  gray: 'text-gray-600',
-};
-
 export function TransactionsView({
   isLoading,
   error,
-  createTransaction,
-  updateTransaction,
-  deleteTransaction,
   typeOptions,
   allTypeOptions,
   categoryOptions,
   searchQuery,
-  setSearchQuery,
   filterType,
-  setFilterType,
   filterCategory,
-  setFilterCategory,
   paginatedTransactions,
   totalPages,
   currentPage,
   startItem,
   endItem,
+  
+  isDialogOpen,
+  setIsDialogOpen,
+  editingId,
+  description,
+  setDescription,
+  amount,
+  setAmount,
+  type,
+  setType,
+  categoryId,
+  setCategoryId,
+  
+  handleSubmit,
+  startEditing,
+  handleDelete,
   handlePageChange,
-  handleFilterChange,
+  handleSearchChange,
+  handleTypeFilterChange,
+  handleCategoryFilterChange,
+  resetForm,
 }: TransactionsViewProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState('');
-  const [type, setType] = useState<'entrada' | 'saida'>('saida');
-  const [categoryId, setCategoryId] = useState('');
-
-  const resetForm = () => {
-    setDescription('');
-    setAmount('');
-    setCategoryId('');
-    setType('saida');
-    setEditingId(null);
-    setIsDialogOpen(false);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!description || !amount || !categoryId) return;
-
-    if (editingId) {
-      const success = await updateTransaction(editingId, {
-        description,
-        amount: parseFloat(amount),
-        type,
-        categoryId,
-      });
-      if (success) resetForm();
-    } else {
-      const success = await createTransaction({
-        description,
-        amount: parseFloat(amount),
-        type,
-        categoryId,
-      });
-      if (success) resetForm();
-    }
-  };
-
-  const startEditing = (transaction: Transaction) => {
-    setEditingId(transaction.id);
-    setDescription(transaction.description);
-    setAmount(transaction.amount.toString());
-    setType(transaction.type as 'entrada' | 'saida');
-    setCategoryId(transaction.categoryId);
-    setIsDialogOpen(true);
-  };
-
-  const handleDelete = async (id: string) => {
-    if (confirm('Tem certeza que deseja excluir esta transação?')) {
-      await deleteTransaction(id);
-    }
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    handleFilterChange();
-  };
-
-  const handleTypeFilterChange = (value: string) => {
-    setFilterType(value);
-    handleFilterChange();
-  };
-
-  const handleCategoryFilterChange = (value: string) => {
-    setFilterCategory(value);
-    handleFilterChange();
-  };
 
   return (
     <div className="space-y-6">
@@ -198,11 +115,12 @@ export function TransactionsView({
             placeholder="Todas"
           />
           <Select
-            label="Período"
-            options={[{ value: 'current', label: 'Novembro / 2025' }]}
-            value="current"
+            label="Ordenar por"
+            options={[{ value: 'date-desc', label: 'Mais recentes' }]}
+            value="date-desc"
             onChange={() => {}}
-            placeholder="Período"
+            placeholder="Mais recentes"
+            disabled
           />
         </div>
       </div>
@@ -210,166 +128,138 @@ export function TransactionsView({
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Descrição
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                  Data
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Categoria
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                  Tipo
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Data
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Valor
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Ações
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    Carregando...
+                  <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                    Carregando transações...
                   </td>
                 </tr>
               ) : paginatedTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    Nenhuma transação encontrada
+                  <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                    Nenhuma transação encontrada.
                   </td>
                 </tr>
               ) : (
-                paginatedTransactions.map((transaction) => {
-                  const Icon = getCategoryIcon(transaction.category.name);
-                  const colorVariant = getCategoryColor(transaction.category.name);
-                  const isIncome = transaction.type === 'entrada';
-
-                  return (
-                    <tr key={transaction.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={cn(
-                              'w-10 h-10 rounded-lg flex items-center justify-center',
-                              iconBgClasses[colorVariant] || iconBgClasses.gray
-                            )}
-                          >
-                            <Icon
-                              className={cn(
-                                'w-5 h-5',
-                                iconColorClasses[colorVariant] ||
-                                  iconColorClasses.gray
-                              )}
-                            />
-                          </div>
-                          <span className="text-sm font-medium text-gray-800">
-                            {transaction.description}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-600">
-                          {formatDate(transaction.createdAt)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Tag variant={colorVariant}>
-                          {transaction.category.name}
-                        </Tag>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Type type={transaction.type as 'entrada' | 'saida'} />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-1">
-                          {isIncome ? (
-                            <>
-                              <TrendingUp className="w-4 h-4 text-brand-base" />
-                              <span className="text-sm font-medium text-brand-base">
-                                + {formatCurrency(transaction.amount)}
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <TrendingDown className="w-4 h-4 text-danger" />
-                              <span className="text-sm font-medium text-gray-800">
-                                - {formatCurrency(transaction.amount)}
-                              </span>
-                            </>
+                paginatedTransactions.map((transaction) => (
+                  <tr
+                    key={transaction.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div
+                          className={cn(
+                            'p-2 rounded-lg mr-3',
+                            transaction.iconBgClass,
+                            transaction.iconColorClass
                           )}
+                        >
+                          <transaction.Icon size={20} />
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <IconButton
-                            icon={Edit}
-                            variant="default"
-                            size="sm"
-                            onClick={() => startEditing(transaction)}
-                            disabled={isLoading}
-                          />
-                          <IconButton
-                            icon={Trash2}
-                            variant="danger"
-                            size="sm"
-                            onClick={() => handleDelete(transaction.id)}
-                            disabled={isLoading}
-                          />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {transaction.description}
+                          </p>
+                          <Type type={transaction.type as 'entrada' | 'saida'} />
                         </div>
-                      </td>
-                    </tr>
-                  );
-                })
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Tag>{transaction.categoryName}</Tag>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">
+                        {formatDate(transaction.createdAt)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        {transaction.type === 'entrada' ? (
+                          <TrendingUp className="w-4 h-4 text-success mr-1" />
+                        ) : (
+                          <TrendingDown className="w-4 h-4 text-danger mr-1" />
+                        )}
+                        <span
+                          className={cn(
+                            'text-sm font-medium',
+                            transaction.type === 'entrada'
+                              ? 'text-success'
+                              : 'text-danger'
+                          )}
+                        >
+                          {formatCurrency(transaction.amount)}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex justify-end space-x-2">
+                        <IconButton
+                          icon={Edit}
+                          onClick={() => startEditing(transaction)}
+                          title="Editar"
+                        />
+                        <IconButton
+                          icon={Trash2}
+                          variant="danger"
+                          onClick={() => handleDelete(transaction.id)}
+                          title="Excluir"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
         </div>
 
-        {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              {startItem} a {endItem} | {paginatedTransactions.length} resultados
+        {!isLoading && paginatedTransactions.length > 0 && (
+          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50">
+            <div className="text-sm text-gray-500">
+              Mostrando <span className="font-medium">{startItem}</span> a{' '}
+              <span className="font-medium">{endItem}</span> de{' '}
+              <span className="font-medium">{totalPages}</span> resultados
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex space-x-2">
               <PaginationButton
+                onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
               >
                 <ChevronLeft className="w-4 h-4" />
               </PaginationButton>
-              {Array.from({ length: Math.min(totalPages, 3) }, (_, i) => {
-                let pageNum;
-                if (totalPages <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage === 1) {
-                  pageNum = i + 1;
-                } else if (currentPage === totalPages) {
-                  pageNum = totalPages - 2 + i;
-                } else {
-                  pageNum = currentPage - 1 + i;
-                }
-                return (
-                  <PaginationButton
-                    key={pageNum}
-                    active={currentPage === pageNum}
-                    onClick={() => handlePageChange(pageNum)}
-                  >
-                    {pageNum}
-                  </PaginationButton>
-                );
-              })}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <PaginationButton
+                  key={page}
+                  active={currentPage === page}
+                  onClick={() => handlePageChange(page)}
+                >
+                  {page}
+                </PaginationButton>
+              ))}
               <PaginationButton
+                onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                onClick={() =>
-                  handlePageChange(Math.min(totalPages, currentPage + 1))
-                }
               >
                 <ChevronRight className="w-4 h-4" />
               </PaginationButton>
@@ -379,82 +269,66 @@ export function TransactionsView({
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogHeader>
-          <DialogTitle>
-            {editingId ? 'Editar Transação' : 'Nova Transação'}
-          </DialogTitle>
-          <DialogDescription>
-            {editingId
-              ? 'Atualize os dados da transação'
-              : 'Preencha os dados para criar uma nova transação'}
-          </DialogDescription>
-          <DialogClose onClose={resetForm} />
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <DialogContent>
-            <div className="space-y-4">
-              <Input
-                label="Descrição"
-                placeholder="Descrição da transação"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                disabled={isLoading}
-                required
-              />
-              <Input
-                label="Valor"
-                type="number"
-                step="0.01"
-                placeholder="0,00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                disabled={isLoading}
-                required
-              />
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>
+              {editingId ? 'Editar Transação' : 'Nova Transação'}
+            </DialogTitle>
+            <DialogDescription>
+              Preencha os detalhes da transação abaixo.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4 py-4">
+            <Input
+              label="Descrição"
+              placeholder="Ex: Compras no mercado"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+            <Input
+              label="Valor (R$)"
+              type="number"
+              placeholder="0,00"
+              step="0.01"
+              min="0"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              required
+            />
+            <div className="grid grid-cols-2 gap-4">
               <Select
                 label="Tipo"
                 options={typeOptions}
                 value={type}
-                onChange={(val) => setType(val as 'entrada' | 'saida')}
-                disabled={isLoading}
+                onChange={setType}
                 placeholder="Selecione o tipo"
               />
               <Select
                 label="Categoria"
-                options={categoryOptions.filter((opt) => opt.value !== '')}
+                options={categoryOptions}
                 value={categoryId}
-                onChange={(val) => setCategoryId(val)}
-                disabled={isLoading}
+                onChange={setCategoryId}
                 placeholder="Selecione a categoria"
               />
             </div>
-          </DialogContent>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="ghost"
-              size="md"
-              onClick={resetForm}
-              disabled={isLoading}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              size="md"
-              disabled={isLoading || !description || !amount || !categoryId}
-            >
-              {isLoading
-                ? editingId
-                  ? 'Salvando...'
-                  : 'Criando...'
-                : editingId
-                  ? 'Salvar'
-                  : 'Criar'}
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <Button
+                variant="ghost"
+                type="button"
+                onClick={() => {
+                  setIsDialogOpen(false);
+                  resetForm();
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? 'Salvando...' : editingId ? 'Salvar' : 'Adicionar'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
       </Dialog>
     </div>
   );

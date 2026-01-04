@@ -28,7 +28,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ),
       danger: cn(
         'bg-danger text-white',
-        'hover:bg-red-700', // Assuming standard red-700 or similar
+        'hover:bg-red-700',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         'focus:ring-danger'
       ),

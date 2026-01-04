@@ -1,12 +1,36 @@
-import { useQuery } from '@apollo/client/react';
 import { ME_QUERY } from '@/graphql/auth.queries';
-import { GET_TRANSACTIONS } from '@/graphql/transactions.queries';
 import { GET_CATEGORIES } from '@/graphql/categories.queries';
-import type { User, Transaction, Category } from '@/types';
+import { GET_TRANSACTIONS } from '@/graphql/transactions.queries';
+import type { Category, Transaction, User } from '@/types';
+import {
+    getCategoryColor,
+    getCategoryIcon,
+} from '@/utils/transaction-helpers';
+import { useQuery } from '@apollo/client/react';
 import { useMemo } from 'react';
 
 const RECENT_TRANSACTIONS_LIMIT = 5;
 const CATEGORIES_WITH_STATS_LIMIT = 5;
+
+const iconBgClasses: Record<string, string> = {
+  blue: 'bg-blue-light',
+  purple: 'bg-purple-light',
+  orange: 'bg-orange-light',
+  green: 'bg-green-light',
+  pink: 'bg-pink-light',
+  yellow: 'bg-yellow-light',
+  gray: 'bg-gray-200',
+};
+
+const iconColorClasses: Record<string, string> = {
+  blue: 'text-blue-base',
+  purple: 'text-purple-base',
+  orange: 'text-orange-base',
+  green: 'text-green-base',
+  pink: 'text-pink-base',
+  yellow: 'text-yellow-base',
+  gray: 'text-gray-600',
+};
 
 export const useDashboardModel = () => {
   const { data: userData, loading: userLoading, error: userError } = useQuery<{ me: User }>(ME_QUERY);
@@ -45,7 +69,18 @@ export const useDashboardModel = () => {
   const recentTransactions = useMemo(() => {
     return transactions
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, RECENT_TRANSACTIONS_LIMIT);
+      .slice(0, RECENT_TRANSACTIONS_LIMIT)
+      .map((transaction) => {
+        const colorVariant = getCategoryColor(transaction.category.name);
+        return {
+          ...transaction,
+          icon: getCategoryIcon(transaction.category.name),
+          isIncome: transaction.type === 'entrada',
+          colorVariant,
+          iconBgClass: iconBgClasses[colorVariant] || iconBgClasses.gray,
+          iconColorClass: iconColorClasses[colorVariant] || iconColorClasses.gray,
+        };
+      });
   }, [transactions]);
 
   const categoriesWithStats = useMemo(() => {
@@ -58,6 +93,7 @@ export const useDashboardModel = () => {
           ...category,
           count: categoryTransactions.length,
           total: categoryTransactions.reduce((sum, t) => sum + t.amount, 0),
+          colorVariant: getCategoryColor(category.name),
         };
       })
       .filter((c) => c.count > 0)
@@ -72,8 +108,24 @@ export const useDashboardModel = () => {
   const isLoading = userLoading || transactionsLoading || categoriesLoading;
   const error = userError ? userError.message : null;
 
+  const isDashboard = window.location.pathname === '/';
+  const isTransactions = window.location.pathname === '/transactions';
+  const isCategories = window.location.pathname === '/categories';
+
+  const userInitials = useMemo(() => {
+    const name = userData?.me?.name;
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }, [userData]);
+
   return {
     user: userData?.me,
+    userInitials,
     transactions,
     categories,
     totalBalance,
@@ -84,5 +136,8 @@ export const useDashboardModel = () => {
     isLoading,
     error,
     logout,
+    isDashboard,
+    isTransactions,
+    isCategories,
   };
 };

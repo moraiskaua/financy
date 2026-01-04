@@ -4,35 +4,15 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/utils/cn';
 import {
     ArrowUpDown,
-    Car,
     Edit2,
-    Heart,
-    Home,
     Plus,
-    ShoppingCart,
     Tag,
     Trash2,
-    Utensils,
-    Wallet,
-    Zap
+    Utensils
 } from 'lucide-react';
 import type { useCategoriesModel } from './use-categories.model';
 
 type CategoriesViewProps = ReturnType<typeof useCategoriesModel>;
-
-const getCategoryIcon = (name: string) => {
-  const lower = name.toLowerCase();
-  if (lower.includes('aliment')) return Utensils;
-  if (lower.includes('entreten')) return Tag;
-  if (lower.includes('invest')) return Wallet;
-  if (lower.includes('mercado')) return ShoppingCart;
-  if (lower.includes('salário') || lower.includes('salario')) return Wallet;
-  if (lower.includes('saúde') || lower.includes('saude')) return Heart;
-  if (lower.includes('transporte')) return Car;
-  if (lower.includes('utilidades')) return Zap;
-  if (lower.includes('casa') || lower.includes('moradia')) return Home;
-  return Tag;
-};
 
 export function CategoriesView({
   categories,
@@ -40,7 +20,6 @@ export function CategoriesView({
   error,
   totalTransactions,
   mostUsedCategoryName,
-  categoryCounts,
   newCategoryName,
   editingId,
   editingName,
@@ -53,6 +32,7 @@ export function CategoriesView({
   onCancelEditing,
   onUpdateSubmit,
   deleteCategory,
+  categoriesWithIcons,
 }: CategoriesViewProps) {
   
   if (error) {
@@ -109,14 +89,12 @@ export function CategoriesView({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {categories.map((category) => {
-            const Icon = getCategoryIcon(category.name);
-            const count = categoryCounts[category.id] || 0;
+        {categoriesWithIcons.map((category) => {
             return (
                 <div key={category.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                     <div className="flex justify-between items-start mb-4">
                         <div className={cn("p-3 rounded-lg bg-blue-50 text-blue-600")}>
-                            <Icon className="w-6 h-6" />
+                            <category.Icon className="w-6 h-6" />
                         </div>
                         <div className="flex gap-2">
                             <button 
@@ -143,7 +121,7 @@ export function CategoriesView({
                             {category.name}
                         </span>
                         <span className="text-xs text-gray-500">
-                            {count} {count === 1 ? 'item' : 'itens'}
+                            {category.count} {category.count === 1 ? 'item' : 'itens'}
                         </span>
                     </div>
                 </div>
@@ -184,7 +162,7 @@ export function CategoriesView({
             <DialogHeader>
                 <DialogTitle>Editar Categoria</DialogTitle>
             </DialogHeader>
-             <form onSubmit={(e) => { e.preventDefault(); onUpdateSubmit(); }} className="space-y-4 mt-4">
+            <form onSubmit={onUpdateSubmit} className="space-y-4 mt-4">
                 <div>
                     <Input 
                         placeholder="Nome da categoria" 

@@ -1,9 +1,30 @@
-import { useMemo, useState } from 'react';
-import { useTransactionsModel } from './use-transactions.model';
 import { useCategoriesModel } from '@/features/categories/use-categories.model';
 import type { Transaction } from '@/types';
+import { getCategoryColor, getCategoryIcon } from '@/utils/transaction-helpers';
+import { useMemo, useState } from 'react';
+import { useTransactionsModel } from './use-transactions.model';
 
 const ITEMS_PER_PAGE = 10;
+
+const iconBgClasses: Record<string, string> = {
+  blue: 'bg-blue-light',
+  purple: 'bg-purple-light',
+  orange: 'bg-orange-light',
+  green: 'bg-green-light',
+  pink: 'bg-pink-light',
+  yellow: 'bg-yellow-light',
+  gray: 'bg-gray-200',
+};
+
+const iconColorClasses: Record<string, string> = {
+  blue: 'text-blue-base',
+  purple: 'text-purple-base',
+  orange: 'text-orange-base',
+  green: 'text-green-base',
+  pink: 'text-pink-base',
+  yellow: 'text-yellow-base',
+  gray: 'text-gray-600',
+};
 
 export const useTransactionsPageModel = () => {
   const transactionsModel = useTransactionsModel();
@@ -13,6 +34,13 @@ export const useTransactionsPageModel = () => {
   const [filterType, setFilterType] = useState<string>('');
   const [filterCategory, setFilterCategory] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState('');
+  const [type, setType] = useState<'entrada' | 'saida'>('saida');
+  const [categoryId, setCategoryId] = useState('');
 
   const isLoading = transactionsModel.isLoading || categoriesModel.isLoading;
   const error = transactionsModel.error || categoriesModel.error;
@@ -60,8 +88,20 @@ export const useTransactionsPageModel = () => {
   const paginatedTransactions = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     const end = start + ITEMS_PER_PAGE;
-    return filteredTransactions.slice(start, end);
-  }, [filteredTransactions, currentPage]);
+    const slice = filteredTransactions.slice(start, end);
+    
+    return slice.map(t => {
+      const categoryName = categoriesModel.categories.find(c => c.id === t.categoryId)?.name || 'Outros';
+      const color = getCategoryColor(categoryName);
+      return {
+        ...t,
+        categoryName,
+        Icon: getCategoryIcon(categoryName),
+        iconBgClass: iconBgClasses[color] || iconBgClasses.gray,
+        iconColorClass: iconColorClasses[color] || iconColorClasses.gray,
+      };
+    });
+  }, [filteredTransactions, currentPage, categoriesModel.categories]);
 
   const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
   const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
@@ -83,6 +123,68 @@ export const useTransactionsPageModel = () => {
 
   const handleFilterChange = () => {
     setCurrentPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    handleFilterChange();
+  };
+
+  const handleTypeFilterChange = (value: string) => {
+    setFilterType(value);
+    handleFilterChange();
+  };
+
+  const handleCategoryFilterChange = (value: string) => {
+    setFilterCategory(value);
+    handleFilterChange();
+  };
+
+  const resetForm = () => {
+    setDescription('');
+    setAmount('');
+    setCategoryId('');
+    setType('saida');
+    setEditingId(null);
+    setIsDialogOpen(false);
+  };
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!description || !amount || !categoryId) return;
+
+    if (editingId) {
+      const success = await transactionsModel.updateTransaction(editingId, {
+        description,
+        amount: parseFloat(amount),
+        type,
+        categoryId,
+      });
+      if (success) resetForm();
+    } else {
+      const success = await transactionsModel.createTransaction({
+        description,
+        amount: parseFloat(amount),
+        type,
+        categoryId,
+      });
+      if (success) resetForm();
+    }
+  };
+
+  const startEditing = (transaction: Transaction) => {
+    setEditingId(transaction.id);
+    setDescription(transaction.description);
+    setAmount(transaction.amount.toString());
+    setType(transaction.type as 'entrada' | 'saida');
+    setCategoryId(transaction.categoryId);
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Tem certeza que deseja excluir esta transação?')) {
+      await transactionsModel.deleteTransaction(id);
+    }
   };
 
   return {
@@ -108,5 +210,24 @@ export const useTransactionsPageModel = () => {
     resetFilters,
     handlePageChange,
     handleFilterChange,
+    
+    isDialogOpen,
+    setIsDialogOpen,
+    editingId,
+    description,
+    setDescription,
+    amount,
+    setAmount,
+    type,
+    setType: (val: string) => setType(val as 'entrada' | 'saida'),
+    categoryId,
+    setCategoryId,
+    
+    handleSubmit,
+    startEditing,
+    handleDelete,
+    handleSearchChange,
+    handleTypeFilterChange,
+    handleCategoryFilterChange,
   };
 };

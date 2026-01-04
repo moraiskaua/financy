@@ -1,27 +1,12 @@
 import logo from '@/assets/logo.svg';
 import { Link } from '@/components/ui/link';
 import { cn } from '@/utils/cn';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import type { useDashboardModel } from './use-dashboard.model';
 
 type DashboardViewProps = ReturnType<typeof useDashboardModel>;
 
-export function DashboardView({ user }: DashboardViewProps) {
-  const location = useLocation();
-  const isDashboard = location.pathname === '/';
-  const isTransactions = location.pathname === '/transactions';
-  const isCategories = location.pathname === '/categories';
-
-  const getInitials = (name?: string) => {
-    if (!name) return 'U';
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
+export function DashboardView({ isDashboard, isTransactions, isCategories, userInitials }: DashboardViewProps) {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -63,7 +48,7 @@ export function DashboardView({ user }: DashboardViewProps) {
             </div>
             <div className="flex items-center">
               <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
-                <span className="text-sm font-medium text-white">{getInitials(user?.name)}</span>
+                <span className="text-sm font-medium text-white">{userInitials}</span>
               </div>
             </div>
           </div>

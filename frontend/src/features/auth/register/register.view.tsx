@@ -1,32 +1,21 @@
 import logo from '@/assets/logo.svg';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRight, Eye, EyeOff, Lock, Mail, User as UserIcon } from 'lucide-react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { registerSchema, type RegisterFormData } from './register.schema';
 import type { useRegisterModel } from './use-register.model';
 
 type RegisterViewProps = ReturnType<typeof useRegisterModel>;
 
-export function RegisterView({ isLoading, error, onSubmit }: RegisterViewProps) {
-  const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
-  });
-
-  const handleFormSubmit = (data: RegisterFormData) => {
-    onSubmit(data.name, data.email, data.password);
-  };
-
+export function RegisterView({
+  isLoading,
+  error,
+  register,
+  errors,
+  handleSubmit,
+  showPassword,
+  togglePasswordVisibility,
+  navigateToLogin,
+}: RegisterViewProps) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="mb-8">
@@ -34,15 +23,13 @@ export function RegisterView({ isLoading, error, onSubmit }: RegisterViewProps) 
       </div>
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-sm">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-1">
-            Criar conta
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">Criar conta</h1>
           <p className="text-sm text-gray-600">
             Comece a controlar suas finanças ainda hoje
           </p>
         </div>
 
-        <form className="space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
+        <form className="space-y-6" onSubmit={handleSubmit}>
           {error && (
             <div className="rounded-md bg-red-light p-4 border border-danger">
               <p className="text-sm text-danger">{error}</p>
@@ -79,7 +66,7 @@ export function RegisterView({ isLoading, error, onSubmit }: RegisterViewProps) 
               label="Senha"
               icon={Lock}
               rightIcon={showPassword ? EyeOff : Eye}
-              onRightIconClick={() => setShowPassword(!showPassword)}
+              onRightIconClick={togglePasswordVisibility}
               autoComplete="new-password"
               error={errors.password?.message}
               helper="A senha deve ter no mínimo 8 caracteres"
@@ -116,7 +103,7 @@ export function RegisterView({ isLoading, error, onSubmit }: RegisterViewProps) 
             size="md"
             icon={ArrowRight}
             className="w-full"
-            onClick={() => navigate('/login')}
+            onClick={navigateToLogin}
           >
             Fazer login
           </Button>
