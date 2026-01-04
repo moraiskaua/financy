@@ -7,11 +7,13 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   helper?: string;
   error?: string;
   icon?: LucideIcon;
+  rightIcon?: LucideIcon;
+  onRightIconClick?: () => void;
   disabled?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, helper, error, icon: Icon, disabled, onFocus, onBlur, ...props }, ref) => {
+  ({ className, label, helper, error, icon: Icon, rightIcon: RightIcon, onRightIconClick, disabled, onFocus, onBlur, ...props }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
     const hasError = !!error;
     const hasValue = !!props.value || (typeof props.value === 'string' && props.value.length > 0);
@@ -26,6 +28,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       setIsFocused(false);
       onBlur?.(e);
     };
+
+    const paddingLeft = Icon ? 'pl-10' : 'pl-3';
+    const paddingRight = RightIcon ? 'pr-10' : 'pr-3';
     
     return (
       <div className="w-full">
@@ -44,7 +49,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {Icon && (
             <Icon
               className={cn(
-                'absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors',
+                'absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors pointer-events-none',
                 disabled
                   ? 'text-gray-500'
                   : isActive && !hasError
@@ -65,7 +70,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             className={cn(
               'w-full rounded-md text-sm transition-colors',
               'focus:outline-none focus:ring-2 focus:ring-offset-0',
-              Icon ? 'pl-10 pr-3 py-2' : 'px-3 py-2',
+              paddingLeft,
+              paddingRight,
+              'py-2',
               disabled
                 ? 'bg-gray-100 border-gray-300 text-gray-800 cursor-not-allowed opacity-50'
                 : hasError
@@ -79,6 +86,25 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             )}
             {...props}
           />
+          {RightIcon && (
+            <button
+              type="button"
+              onClick={onRightIconClick}
+              disabled={disabled}
+              className={cn(
+                'absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors cursor-pointer',
+                disabled
+                  ? 'text-gray-500 cursor-not-allowed'
+                  : hasError
+                    ? 'text-danger'
+                    : hasValue
+                      ? 'text-gray-800'
+                      : 'text-gray-400'
+              )}
+            >
+              <RightIcon className="w-5 h-5" />
+            </button>
+          )}
         </div>
         {(helper || error) && (
           <p className={cn('mt-1 text-sm', error ? 'text-danger' : 'text-gray-500')}>

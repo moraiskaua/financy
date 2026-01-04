@@ -24,7 +24,7 @@ export const authResolvers = {
   },
   Mutation: {
     register: async (_: unknown, { input }: { input: RegisterInput }): Promise<AuthPayload> => {
-      const { email, password } = input;
+      const { name, email, password } = input;
 
       const existingUser = await prisma.user.findUnique({
         where: { email },
@@ -40,6 +40,7 @@ export const authResolvers = {
 
       const user = await prisma.user.create({
         data: {
+          name,
           email,
           password: hashedPassword,
         },

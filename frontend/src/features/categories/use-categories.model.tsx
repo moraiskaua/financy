@@ -1,6 +1,6 @@
-import { useQuery, useMutation } from '@apollo/client/react';
-import { GET_CATEGORIES, CREATE_CATEGORY, UPDATE_CATEGORY, DELETE_CATEGORY } from '@/graphql/categories.queries';
+import { CREATE_CATEGORY, DELETE_CATEGORY, GET_CATEGORIES, UPDATE_CATEGORY } from '@/graphql/categories.queries';
 import type { Category, CreateCategoryInput, UpdateCategoryInput } from '@/types';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { useState } from 'react';
 
 export const useCategoriesModel = () => {
@@ -24,7 +24,7 @@ export const useCategoriesModel = () => {
       await refetch();
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create category');
+      setError(err instanceof Error ? err.message : 'Falha ao criar categoria');
       return false;
     } finally {
       setIsSubmitting(false);
@@ -42,7 +42,7 @@ export const useCategoriesModel = () => {
       await refetch();
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update category');
+      setError(err instanceof Error ? err.message : 'Falha ao atualizar categoria');
       return false;
     } finally {
       setIsSubmitting(false);
@@ -59,7 +59,7 @@ export const useCategoriesModel = () => {
       await refetch();
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete category');
+      setError(err instanceof Error ? err.message : 'Falha ao excluir categoria');
       return false;
     } finally {
       setIsSubmitting(false);

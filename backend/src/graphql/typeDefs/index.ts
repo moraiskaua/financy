@@ -1,6 +1,7 @@
 export const typeDefs = `#graphql
   type User {
     id: ID!
+    name: String!
     email: String!
     createdAt: String!
     updatedAt: String!
@@ -32,6 +33,7 @@ export const typeDefs = `#graphql
   }
 
   input RegisterInput {
+    name: String!
     email: String!
     password: String!
   }

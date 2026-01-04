@@ -23,7 +23,7 @@ export const useTransactionsModel = () => {
       await refetch();
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create transaction');
+      setError(err instanceof Error ? err.message : 'Falha ao criar transação');
       return false;
     } finally {
       setIsSubmitting(false);
@@ -40,7 +40,7 @@ export const useTransactionsModel = () => {
       await refetch();
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update transaction');
+      setError(err instanceof Error ? err.message : 'Falha ao atualizar transação');
       return false;
     } finally {
       setIsSubmitting(false);
@@ -57,7 +57,7 @@ export const useTransactionsModel = () => {
       await refetch();
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete transaction');
+      setError(err instanceof Error ? err.message : 'Falha ao excluir transação');
       return false;
     } finally {
       setIsSubmitting(false);

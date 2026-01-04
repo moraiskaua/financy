@@ -1,14 +1,20 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { User as UserIcon, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { registerSchema, type RegisterFormData } from './register.schema';
 import type { useRegisterModel } from './use-register.model';
+import logo from '@/assets/logo.svg';
 
 type RegisterViewProps = ReturnType<typeof useRegisterModel>;
 
 export function RegisterView({ isLoading, error, onSubmit }: RegisterViewProps) {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  
   const {
     register,
     handleSubmit,
@@ -18,86 +24,102 @@ export function RegisterView({ isLoading, error, onSubmit }: RegisterViewProps) 
   });
 
   const handleFormSubmit = (data: RegisterFormData) => {
-    onSubmit(data.email, data.password);
+    onSubmit(data.name, data.email, data.password);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Start managing your finances today
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="mb-8">
+        <img src={logo} alt="FINANCY" className="h-8" />
+      </div>
+      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-sm">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">
+            Criar conta
+          </h1>
+          <p className="text-sm text-gray-600">
+            Comece a controlar suas finanças ainda hoje
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
+        <form className="space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
           {error && (
-            <div className="rounded-md bg-red-50 p-4 border border-red-200">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="rounded-md bg-red-light p-4 border border-danger">
+              <p className="text-sm text-danger">{error}</p>
             </div>
           )}
 
           <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email address
-              </label>
-              <Input
-                {...register('email')}
-                id="email"
-                type="email"
-                autoComplete="email"
-                error={errors.email?.message}
-                placeholder="Email address"
-              />
-            </div>
+            <Input
+              {...register('name')}
+              id="name"
+              type="text"
+              label="Nome completo"
+              icon={UserIcon}
+              autoComplete="name"
+              error={errors.name?.message}
+              placeholder="Seu nome completo"
+            />
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <Input
-                {...register('password')}
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                error={errors.password?.message}
-                placeholder="Password (min. 6 characters)"
-              />
-            </div>
+            <Input
+              {...register('email')}
+              id="email"
+              type="email"
+              label="E-mail"
+              icon={Mail}
+              autoComplete="email"
+              error={errors.email?.message}
+              placeholder="mail@exemplo.com"
+            />
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm Password
-              </label>
-              <Input
-                {...register('confirmPassword')}
-                id="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                error={errors.confirmPassword?.message}
-                placeholder="Confirm your password"
-              />
-            </div>
+            <Input
+              {...register('password')}
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              label="Senha"
+              icon={Lock}
+              rightIcon={showPassword ? EyeOff : Eye}
+              onRightIconClick={() => setShowPassword(!showPassword)}
+              autoComplete="new-password"
+              error={errors.password?.message}
+              helper="A senha deve ter no mínimo 8 caracteres"
+              placeholder="Digite sua senha"
+            />
           </div>
 
           <Button
             type="submit"
+            variant="primary"
+            size="md"
             disabled={isLoading}
             className="w-full"
           >
-            {isLoading ? 'Creating account...' : 'Create account'}
+            {isLoading ? 'Cadastrando...' : 'Cadastrar'}
           </Button>
 
-          <div className="text-center text-sm">
-            <span className="text-gray-500">Already have an account? </span>
-            <Link to="/login" className="font-medium text-brand-base hover:text-brand-dark">
-              Sign in here
-            </Link>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-600">ou</span>
+            </div>
           </div>
+
+          <div className="text-center text-sm mb-4">
+            <span className="text-gray-600">Já tem uma conta? </span>
+          </div>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="md"
+            icon={ArrowRight}
+            className="w-full"
+            onClick={() => navigate('/login')}
+          >
+            Fazer login
+          </Button>
         </form>
       </div>
     </div>

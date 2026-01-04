@@ -3,7 +3,7 @@ import { type ButtonHTMLAttributes, forwardRef } from 'react';
 import { type LucideIcon } from 'lucide-react';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
   size?: 'sm' | 'md';
   icon?: LucideIcon;
   iconPosition?: 'left' | 'right';
@@ -19,6 +19,18 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         'hover:bg-brand-dark',
         'disabled:bg-brand-base disabled:opacity-50 disabled:cursor-not-allowed',
         'focus:ring-brand-base'
+      ),
+      secondary: cn(
+        'bg-gray-200 text-gray-800',
+        'hover:bg-gray-300',
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        'focus:ring-gray-400'
+      ),
+      danger: cn(
+        'bg-danger text-white',
+        'hover:bg-red-700', // Assuming standard red-700 or similar
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        'focus:ring-danger'
       ),
       ghost: cn(
         'bg-white text-gray-800 border border-gray-300',

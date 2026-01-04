@@ -54,7 +54,7 @@ export function DashboardView({ user, logout }: DashboardViewProps) {
                     <div className="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand-dark">
                       <UserIcon className="w-4 h-4" />
                     </div>
-                    <span className="hidden md:inline">{user?.email}</span>
+                    <span className="hidden md:inline">{user?.name || user?.email}</span>
                   </div>
                   <Button
                     onClick={logout}

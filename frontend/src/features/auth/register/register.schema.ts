@@ -1,12 +1,9 @@
 import { z } from 'zod';
 
 export const registerSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
+  name: z.string().min(1, 'O nome é obrigatório'),
+  email: z.string().email('E-mail inválido'),
+  password: z.string().min(8, 'A senha deve ter no mínimo 8 caracteres'),
 });
 
 export type RegisterFormData = z.infer<typeof registerSchema>;

@@ -6,6 +6,7 @@ export const REGISTER_MUTATION = gql`
       token
       user {
         id
+        name
         email
         createdAt
         updatedAt
@@ -20,6 +21,7 @@ export const LOGIN_MUTATION = gql`
       token
       user {
         id
+        name
         email
         createdAt
         updatedAt
@@ -32,6 +34,7 @@ export const ME_QUERY = gql`
   query Me {
     me {
       id
+      name
       email
       createdAt
       updatedAt

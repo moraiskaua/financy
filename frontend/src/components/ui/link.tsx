@@ -27,8 +27,8 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
       'focus:outline-none focus:ring-2 focus:ring-brand-base focus:ring-offset-2 rounded'
     );
 
-    if ('to' in props) {
-      const { to, ...routerProps } = props;
+    if ('to' in props && props.to) {
+      const { to, ...routerProps } = props as InternalLinkProps;
       return (
         <RouterLink
           to={to}
@@ -55,4 +55,3 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
 );
 
 Link.displayName = 'Link';
-

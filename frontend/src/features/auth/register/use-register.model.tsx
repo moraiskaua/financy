@@ -9,8 +9,8 @@ export const useRegisterModel = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = useCallback(async (email: string, password: string) => {
-    const input: RegisterInput = { email, password };
+  const handleSubmit = useCallback(async (name: string, email: string, password: string) => {
+    const input: RegisterInput = { name, email, password };
 
     try {
       setIsLoading(true);
@@ -29,9 +29,9 @@ export const useRegisterModel = () => {
         return true;
       }
 
-      throw new Error('Registration failed');
+      throw new Error('Falha ao criar conta');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      setError(err instanceof Error ? err.message : 'Falha ao criar conta');
       return false;
     } finally {
       setIsLoading(false);

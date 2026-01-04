@@ -29,9 +29,9 @@ export const useLoginModel = () => {
         return true;
       }
 
-      throw new Error('Login failed');
+      throw new Error('Falha ao fazer login');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setError(err instanceof Error ? err.message : 'Falha ao fazer login');
       return false;
     } finally {
       setIsLoading(false);
