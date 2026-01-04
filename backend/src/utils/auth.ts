@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { GraphQLError } from 'graphql';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -25,4 +26,24 @@ export const verifyToken = (token: string): { userId: string } | null => {
   } catch (error) {
     return null;
   }
+};
+
+export const getUserIdFromContext = (context: any): string => {
+  const token = context.token.replace('Bearer ', '');
+
+  if (!token) {
+    throw new GraphQLError('Not authenticated', {
+      extensions: { code: 'UNAUTHENTICATED' },
+    });
+  }
+
+  const payload = verifyToken(token);
+
+  if (!payload) {
+    throw new GraphQLError('Invalid token', {
+      extensions: { code: 'UNAUTHENTICATED' },
+    });
+  }
+
+  return payload.userId;
 };
