@@ -1,11 +1,18 @@
 import type { LucideIcon } from 'lucide-react';
 import {
+  Book,
   Briefcase,
   Car,
+  Dumbbell,
+  FileText,
   Fuel,
+  Gift,
   Heart,
   Home,
+  LayoutGrid,
+  PawPrint,
   PiggyBank,
+  ShoppingBag,
   ShoppingCart,
   Tag,
   Ticket,
@@ -14,7 +21,39 @@ import {
   Zap,
 } from 'lucide-react';
 
+export const ICONS_MAP: Record<string, LucideIcon> = {
+  briefcase: Briefcase,
+  car: Car,
+  heart: Heart,
+  home: Home,
+  cart: ShoppingCart,
+  ticket: Ticket,
+  gift: Gift,
+  food: Utensils,
+  pet: PawPrint,
+  gym: Dumbbell,
+  book: Book,
+  shopping: ShoppingBag,
+  bill: FileText,
+  other: LayoutGrid,
+  // Legacy mappings
+  alimentacao: Utensils,
+  transporte: Car,
+  mercado: ShoppingCart,
+  investimento: Briefcase,
+  receita: PiggyBank,
+  salario: Wallet,
+  utilidades: Zap,
+  entretenimento: Ticket,
+  default: Tag,
+};
+
+export function getIconByName(name: string): LucideIcon {
+  return ICONS_MAP[name] || ICONS_MAP.default;
+}
+
 export const categoryIcons: Record<string, LucideIcon> = {
+  // Keeping for backward compatibility if needed, but pointing to new map
   Alimentação: Utensils,
   Transporte: Fuel,
   Mercado: ShoppingCart,
@@ -25,6 +64,7 @@ export const categoryIcons: Record<string, LucideIcon> = {
   Entretenimento: Ticket,
   default: Tag,
 };
+
 
 export const categoryColors: Record<
   string,

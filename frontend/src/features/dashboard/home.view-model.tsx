@@ -13,8 +13,6 @@ export default function HomeViewModel() {
 
   return (
     <HomeView
-      transactions={[]}
-      categories={[]}
       totalBalance={totalBalance}
       monthlyIncome={monthlyIncome}
       monthlyExpenses={monthlyExpenses}

@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
 import { IconButton } from '@/components/ui/icon-button';
 import { Input } from '@/components/ui/input';
@@ -16,14 +16,14 @@ import { Type } from '@/components/ui/type';
 import { cn } from '@/utils/cn';
 import { formatCurrency, formatDate } from '@/utils/transaction-helpers';
 import {
-  ChevronLeft,
-  ChevronRight,
-  Edit,
-  Plus,
-  Search,
-  Trash2,
-  TrendingDown,
-  TrendingUp,
+    ChevronLeft,
+    ChevronRight,
+    Edit,
+    Plus,
+    Search,
+    Trash2,
+    TrendingDown,
+    TrendingUp,
 } from 'lucide-react';
 import { CreateTransactionDialog } from './components/create-transaction-dialog';
 import type { useTransactionsPageModel } from './use-transactions-page.model';
@@ -49,7 +49,6 @@ export function TransactionsView({
   setIsCreateDialogOpen,
   isDialogOpen,
   setIsDialogOpen,
-  editingId,
   description,
   setDescription,
   amount,
@@ -277,7 +276,7 @@ export function TransactionsView({
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[400px] p-0">
           <DialogHeader>
             <DialogTitle>
               Editar Transação
@@ -286,39 +285,41 @@ export function TransactionsView({
               Edite os detalhes da transação abaixo.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4 py-4">
-            <Input
-              label="Descrição"
-              placeholder="Ex: Compras no mercado"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            />
-            <Input
-              label="Valor (R$)"
-              type="number"
-              placeholder="0,00"
-              step="0.01"
-              min="0"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              required
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <Select
-                label="Tipo"
-                options={typeOptions}
-                value={type}
-                onChange={setType}
-                placeholder="Selecione o tipo"
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4 px-6 py-4">
+              <Input
+                label="Descrição"
+                placeholder="Ex: Compras no mercado"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
               />
-              <Select
-                label="Categoria"
-                options={categoryOptions}
-                value={categoryId}
-                onChange={setCategoryId}
-                placeholder="Selecione a categoria"
+              <Input
+                label="Valor (R$)"
+                type="number"
+                placeholder="0,00"
+                step="0.01"
+                min="0"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                required
               />
+              <div className="grid grid-cols-2 gap-4">
+                <Select
+                  label="Tipo"
+                  options={typeOptions}
+                  value={type}
+                  onChange={setType}
+                  placeholder="Selecione o tipo"
+                />
+                <Select
+                  label="Categoria"
+                  options={categoryOptions}
+                  value={categoryId}
+                  onChange={setCategoryId}
+                  placeholder="Selecione a categoria"
+                />
+              </div>
             </div>
             <DialogFooter>
               <Button

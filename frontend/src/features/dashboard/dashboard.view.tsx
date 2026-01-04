@@ -1,12 +1,11 @@
 import logo from '@/assets/logo.svg';
-import { Link } from '@/components/ui/link';
 import { cn } from '@/utils/cn';
-import { Outlet } from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
 import type { useDashboardModel } from './use-dashboard.model';
 
 type DashboardViewProps = ReturnType<typeof useDashboardModel>;
 
-export function DashboardView({ isDashboard, isTransactions, isCategories, userInitials }: DashboardViewProps) {
+export function DashboardView({ userInitials }: DashboardViewProps) {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -17,41 +16,47 @@ export function DashboardView({ isDashboard, isTransactions, isCategories, userI
                 <img src={logo} alt="FINANCY" className="h-8" />
               </div>
               <nav className="hidden md:flex items-center gap-6 flex-1 justify-center">
-                <Link
+                <NavLink
                   to="/"
-                  className={cn(
-                    'text-sm font-medium transition-colors',
-                    isDashboard ? 'text-brand-base' : 'text-gray-800 hover:text-brand-base'
-                  )}
+                  className={({ isActive }) =>
+                    cn(
+                      'text-sm font-medium transition-colors',
+                      isActive ? 'text-brand-base' : 'text-gray-800 hover:text-brand-base'
+                    )
+                  }
                 >
                   Dashboard
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   to="/transactions"
-                  className={cn(
-                    'text-sm font-medium transition-colors',
-                    isTransactions ? 'text-brand-base' : 'text-gray-800 hover:text-brand-base'
-                  )}
+                  className={({ isActive }) =>
+                    cn(
+                      'text-sm font-medium transition-colors',
+                      isActive ? 'text-brand-base' : 'text-gray-800 hover:text-brand-base'
+                    )
+                  }
                 >
                   Transações
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   to="/categories"
-                  className={cn(
-                    'text-sm font-medium transition-colors',
-                    isCategories ? 'text-brand-base' : 'text-gray-800 hover:text-brand-base'
-                  )}
+                  className={({ isActive }) =>
+                    cn(
+                      'text-sm font-medium transition-colors',
+                      isActive ? 'text-brand-base' : 'text-gray-800 hover:text-brand-base'
+                    )
+                  }
                 >
                   Categorias
-                </Link>
+                </NavLink>
               </nav>
             </div>
             <div className="flex items-center">
-              <Link to="/profile">
+              <NavLink to="/profile">
                 <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center hover:bg-gray-400 transition-colors cursor-pointer">
                   <span className="text-sm font-medium text-white">{userInitials}</span>
                 </div>
-              </Link>
+              </NavLink>
             </div>
           </div>
         </div>

@@ -1,8 +1,8 @@
+import { Category } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { prisma } from '../../config/database';
-import { getUserIdFromContext } from '../../utils/auth';
 import { Context, CreateCategoryInput, UpdateCategoryInput } from '../../types/context';
-import { Category } from '@prisma/client';
+import { getUserIdFromContext } from '../../utils/auth';
 
 export const categoryResolvers = {
   Query: {
@@ -35,7 +35,7 @@ export const categoryResolvers = {
   Mutation: {
     createCategory: async (_: unknown, { input }: { input: CreateCategoryInput }, context: Context): Promise<Category> => {
       const userId = getUserIdFromContext(context);
-      const { name } = input;
+      const { name, description, icon, color } = input;
 
       const existingCategory = await prisma.category.findFirst({
         where: { name, userId },
@@ -50,6 +50,9 @@ export const categoryResolvers = {
       const category = await prisma.category.create({
         data: {
           name,
+          description,
+          icon: icon || 'briefcase',
+          color: color || 'green',
           userId,
         },
       });
@@ -58,7 +61,7 @@ export const categoryResolvers = {
     },
     updateCategory: async (_: unknown, { id, input }: { id: string; input: UpdateCategoryInput }, context: Context): Promise<Category> => {
       const userId = getUserIdFromContext(context);
-      const { name } = input;
+      const { name, description, icon, color } = input;
 
       const category = await prisma.category.findFirst({
         where: { id, userId },
@@ -70,23 +73,14 @@ export const categoryResolvers = {
         });
       }
 
-      const existingCategory = await prisma.category.findFirst({
-        where: {
-          name,
-          userId,
-          id: { not: id },
-        },
-      });
-
-      if (existingCategory) {
-        throw new GraphQLError('Category with this name already exists', {
-          extensions: { code: 'BAD_USER_INPUT' },
-        });
-      }
-
       const updatedCategory = await prisma.category.update({
         where: { id },
-        data: { name },
+        data: {
+          name: name || undefined,
+          description: description || undefined,
+          icon: icon || undefined,
+          color: color || undefined,
+        },
       });
 
       return updatedCategory;

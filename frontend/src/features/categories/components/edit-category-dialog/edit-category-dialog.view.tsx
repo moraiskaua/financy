@@ -1,16 +1,16 @@
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogTitle
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/utils/cn';
 import { Book, Briefcase, Car, Dumbbell, FileText, Gift, Heart, Home, LayoutGrid, PawPrint, ShoppingBag, ShoppingCart, Ticket, Utensils, X } from 'lucide-react';
-import type { useCreateCategoryDialogModel } from './create-category-dialog.model';
+import type { useEditCategoryDialogModel } from './edit-category-dialog.model';
 
-type CreateCategoryDialogViewProps = ReturnType<typeof useCreateCategoryDialogModel> & {
+type EditCategoryDialogViewProps = ReturnType<typeof useEditCategoryDialogModel> & {
   isOpen: boolean;
   onClose: () => void;
 };
@@ -42,7 +42,7 @@ const COLORS = [
   { name: 'yellow', class: 'bg-yellow-500' },
 ];
 
-export function CreateCategoryDialogView({
+export function EditCategoryDialogView({
   isOpen,
   onClose,
   name,
@@ -56,14 +56,14 @@ export function CreateCategoryDialogView({
   isLoading,
   error,
   handleSubmit,
-}: CreateCategoryDialogViewProps) {
+}: EditCategoryDialogViewProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden bg-white max-h-[90vh] overflow-y-auto">
         <div className="p-6 pb-0">
           <div className="flex items-center justify-between mb-2">
             <DialogTitle className="text-xl font-bold text-gray-900">
-              Nova categoria
+              Editar categoria
             </DialogTitle>
             <button
               onClick={onClose}
@@ -73,7 +73,7 @@ export function CreateCategoryDialogView({
             </button>
           </div>
           <DialogDescription className="text-gray-500 mb-6">
-            Organize suas transações com categorias
+            Edite as informações da categoria
           </DialogDescription>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -151,7 +151,7 @@ export function CreateCategoryDialogView({
                 className="w-full bg-green-700 hover:bg-green-800 text-white py-6 text-base"
                 disabled={isLoading}
               >
-                {isLoading ? 'Salvando...' : 'Salvar'}
+                {isLoading ? 'Salvando...' : 'Salvar alterações'}
               </Button>
             </div>
           </form>

@@ -1,7 +1,7 @@
 import { CREATE_CATEGORY, DELETE_CATEGORY, GET_CATEGORIES, UPDATE_CATEGORY } from '@/graphql/categories.queries';
 import { GET_TRANSACTIONS } from '@/graphql/transactions.queries';
 import type { Category, CreateCategoryInput, Transaction, UpdateCategoryInput } from '@/types';
-import { getCategoryIcon } from '@/utils/transaction-helpers';
+import { getIconByName } from '@/utils/transaction-helpers';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { useMemo, useState } from 'react';
 
@@ -16,8 +16,6 @@ export const useCategoriesModel = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingName, setEditingName] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const categories = data?.categories ?? [];
@@ -46,7 +44,7 @@ export const useCategoriesModel = () => {
 
     const mappedCategories = currentCategories.map((c) => ({
       ...c,
-      Icon: getCategoryIcon(c.name),
+      Icon: getIconByName(c.icon || 'briefcase'),
       count: counts[c.id] || 0,
     }));
 
@@ -58,11 +56,11 @@ export const useCategoriesModel = () => {
     };
   }, [data?.categories, transactionsData?.transactions]);
 
-  const createCategory = async (name: string) => {
+  const createCategory = async (name: string, description?: string, icon?: string, color?: string) => {
     setIsSubmitting(true);
     setError(null);
     try {
-      const input: CreateCategoryInput = { name };
+      const input: CreateCategoryInput = { name, description, icon, color };
       await createMutation({
         variables: { input },
       });
@@ -76,11 +74,10 @@ export const useCategoriesModel = () => {
     }
   };
 
-  const updateCategory = async (id: string, name: string) => {
+  const updateCategory = async (id: string, input: UpdateCategoryInput) => {
     setIsSubmitting(true);
     setError(null);
     try {
-      const input: UpdateCategoryInput = { name };
       await updateMutation({
         variables: { id, input },
       });
@@ -111,26 +108,6 @@ export const useCategoriesModel = () => {
     }
   };
 
-  const onStartEditing = (category: Category) => {
-    setEditingId(category.id);
-    setEditingName(category.name);
-  };
-
-  const onCancelEditing = () => {
-    setEditingId(null);
-    setEditingName('');
-  };
-
-  const onUpdateSubmit = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!editingId || !editingName.trim()) return;
-    const success = await updateCategory(editingId, editingName);
-    if (success) {
-      setEditingId(null);
-      setEditingName('');
-    }
-  };
-
   return {
     categories,
     isLoading: isLoadingCategories || isLoadingTransactions || isSubmitting,
@@ -139,17 +116,11 @@ export const useCategoriesModel = () => {
     totalTransactions,
     mostUsedCategoryName,
     categoryCounts,
-
-    editingId,
-    editingName,
     isCreateModalOpen,
     
-    setEditingName,
     setIsCreateModalOpen,
-    onStartEditing,
-    onCancelEditing,
-    onUpdateSubmit,
     createCategory,
+    updateCategory,
     deleteCategory,
     categoriesWithIcons,
   };

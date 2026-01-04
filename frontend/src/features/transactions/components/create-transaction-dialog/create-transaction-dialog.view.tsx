@@ -34,7 +34,7 @@ export function CreateTransactionDialogView({
 }: CreateTransactionDialogViewProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden bg-white">
+      <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden bg-white">
         <div className="p-6 pb-0">
           <div className="flex items-center justify-between mb-2">
             <DialogTitle className="text-xl font-bold text-gray-900">

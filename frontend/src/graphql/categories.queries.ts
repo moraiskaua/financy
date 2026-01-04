@@ -5,6 +5,9 @@ export const GET_CATEGORIES = gql`
     categories {
       id
       name
+      description
+      icon
+      color
       createdAt
       updatedAt
     }
@@ -16,6 +19,9 @@ export const CREATE_CATEGORY = gql`
     createCategory(input: $input) {
       id
       name
+      description
+      icon
+      color
       createdAt
       updatedAt
     }
@@ -27,6 +33,9 @@ export const UPDATE_CATEGORY = gql`
     updateCategory(id: $id, input: $input) {
       id
       name
+      description
+      icon
+      color
       createdAt
       updatedAt
     }

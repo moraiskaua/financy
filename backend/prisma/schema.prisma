@@ -25,6 +25,9 @@ model Category {
   name         String
   userId       String
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  description  String?
+  icon         String        @default("briefcase")
+  color        String        @default("green")
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   transactions Transaction[]

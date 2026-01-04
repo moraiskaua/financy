@@ -9,6 +9,9 @@ export interface User {
 export interface Category {
   id: string;
   name: string;
+  description?: string;
+  icon: string;
+  color: string;
   userId: string;
   createdAt: string;
   updatedAt: string;
@@ -44,10 +47,16 @@ export interface LoginInput {
 
 export interface CreateCategoryInput {
   name: string;
+  description?: string;
+  icon?: string;
+  color?: string;
 }
 
 export interface UpdateCategoryInput {
-  name: string;
+  name?: string;
+  description?: string;
+  icon?: string;
+  color?: string;
 }
 
 export interface CreateTransactionInput {

@@ -1,16 +1,27 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import type { Category } from '@/types';
 import { cn } from '@/utils/cn';
 import {
-    ArrowUpDown,
-    Edit2,
-    Plus,
-    Tag,
-    Trash2,
-    Utensils
+  ArrowUpDown,
+  Edit2,
+  Plus,
+  Tag,
+  Trash2,
+  Utensils
 } from 'lucide-react';
+import { useState } from 'react';
 import { CreateCategoryDialog } from './components/create-category-dialog';
+import { EditCategoryDialog } from './components/edit-category-dialog';
 import type { useCategoriesModel } from './use-categories.model';
 
 type CategoriesViewProps = ReturnType<typeof useCategoriesModel>;
@@ -21,18 +32,30 @@ export function CategoriesView({
   error,
   totalTransactions,
   mostUsedCategoryName,
-  editingId,
-  editingName,
   isCreateModalOpen,
-  setEditingName,
   setIsCreateModalOpen,
-  onStartEditing,
-  onCancelEditing,
-  onUpdateSubmit,
   deleteCategory,
   categoriesWithIcons,
 }: CategoriesViewProps) {
-  
+  const [deleteConfirmationId, setDeleteConfirmationId] = useState<string | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+
+  const handleEditClick = (category: any) => {
+    // Adapter for the category object if needed, but it should match
+    setEditingCategory(category);
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setDeleteConfirmationId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteConfirmationId) {
+      await deleteCategory(deleteConfirmationId);
+      setDeleteConfirmationId(null);
+    }
+  };
+
   if (error) {
     return (
       <div className="p-6 text-center text-red-600">
@@ -92,22 +115,25 @@ export function CategoriesView({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {categoriesWithIcons.map((category) => {
+            const iconColorClass = category.color ? `text-${category.color}-600` : 'text-blue-600';
+            const bgColorClass = category.color ? `bg-${category.color}-50` : 'bg-blue-50';
+            
             return (
                 <div key={category.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                     <div className="flex justify-between items-start mb-4">
-                        <div className={cn("p-3 rounded-lg bg-blue-50 text-blue-600")}>
+                        <div className={cn("p-3 rounded-lg", bgColorClass, iconColorClass)}>
                             <category.Icon className="w-6 h-6" />
                         </div>
                         <div className="flex gap-2">
                             <button 
-                                onClick={() => deleteCategory(category.id)}
+                                onClick={() => handleDeleteClick(category.id)}
                                 className="p-2 text-red-400 hover:bg-red-50 rounded-lg transition-colors"
                                 disabled={isLoading}
                             >
                                 <Trash2 className="w-4 h-4" />
                             </button>
                             <button 
-                                onClick={() => onStartEditing(category)}
+                                onClick={() => handleEditClick(category)}
                                 className="p-2 text-gray-400 hover:bg-gray-50 rounded-lg transition-colors"
                                 disabled={isLoading}
                             >
@@ -119,7 +145,7 @@ export function CategoriesView({
                     <h3 className="font-bold text-gray-900 mb-1">{category.name}</h3>
                     
                     <div className="flex justify-between items-center mt-4">
-                        <span className="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded-full">
+                        <span className={cn("px-3 py-1 text-xs font-medium rounded-full", bgColorClass, iconColorClass)}>
                             {category.name}
                         </span>
                         <span className="text-xs text-gray-500">
@@ -143,27 +169,30 @@ export function CategoriesView({
         onSuccess={() => setIsCreateModalOpen(false)}
       />
 
-      <Dialog open={!!editingId} onOpenChange={(open) => !open && onCancelEditing()}>
-        <DialogContent>
-            <DialogHeader>
-                <DialogTitle>Editar Categoria</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={onUpdateSubmit} className="space-y-4 mt-4">
-                <div>
-                    <Input 
-                        placeholder="Nome da categoria" 
-                        value={editingName}
-                        onChange={(e) => setEditingName(e.target.value)}
-                        autoFocus
-                    />
-                </div>
-                <DialogFooter>
-                    <Button type="button" variant="ghost" onClick={onCancelEditing}>Cancelar</Button>
-                    <Button type="submit" disabled={isLoading || !editingName.trim()}>Salvar</Button>
-                </DialogFooter>
-            </form>
-        </DialogContent>
-      </Dialog>
+      <EditCategoryDialog
+        isOpen={!!editingCategory}
+        onClose={() => setEditingCategory(null)}
+        category={editingCategory}
+        onSuccess={() => setEditingCategory(null)}
+      />
+
+      <AlertDialog open={!!deleteConfirmationId} onOpenChange={(open) => !open && setDeleteConfirmationId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Essa ação não pode ser desfeita. Isso excluirá permanentemente a categoria
+              e removerá os dados de nossos servidores.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700 text-white">
+              Sim, excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

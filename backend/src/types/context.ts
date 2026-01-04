@@ -25,10 +25,16 @@ export interface LoginInput {
 
 export interface CreateCategoryInput {
   name: string;
+  description?: string;
+  icon?: string;
+  color?: string;
 }
 
 export interface UpdateCategoryInput {
-  name: string;
+  name?: string;
+  description?: string;
+  icon?: string;
+  color?: string;
 }
 
 export interface CreateTransactionInput {
