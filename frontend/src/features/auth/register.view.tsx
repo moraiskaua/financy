@@ -2,21 +2,21 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { loginSchema, type LoginFormData } from './login.schema';
-import type { useLoginModel } from './use-login.model';
+import { registerSchema, type RegisterFormData } from './register.schema';
+import type { useRegisterModel } from './use-register.model';
 
-type LoginViewProps = ReturnType<typeof useLoginModel>;
+type RegisterViewProps = ReturnType<typeof useRegisterModel>;
 
-export function LoginView({ isLoading, error, onSubmit }: LoginViewProps) {
+export function RegisterView({ isLoading, error, onSubmit }: RegisterViewProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
   });
 
-  const handleFormSubmit = (data: LoginFormData) => {
+  const handleFormSubmit = (data: RegisterFormData) => {
     onSubmit(data.email, data.password);
   };
 
@@ -25,10 +25,10 @@ export function LoginView({ isLoading, error, onSubmit }: LoginViewProps) {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-800">
-            Sign in to Financy
+            Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Manage your personal finances
+            Start managing your finances today
           </p>
         </div>
 
@@ -62,9 +62,23 @@ export function LoginView({ isLoading, error, onSubmit }: LoginViewProps) {
                 {...register('password')}
                 id="password"
                 type="password"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 error={errors.password?.message}
-                placeholder="Password"
+                placeholder="Password (min. 6 characters)"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                Confirm Password
+              </label>
+              <Input
+                {...register('confirmPassword')}
+                id="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                error={errors.confirmPassword?.message}
+                placeholder="Confirm your password"
               />
             </div>
           </div>
@@ -74,7 +88,7 @@ export function LoginView({ isLoading, error, onSubmit }: LoginViewProps) {
             disabled={isLoading}
             className="w-full"
           >
-            {isLoading ? 'Signing in...' : 'Sign in'}
+            {isLoading ? 'Creating account...' : 'Create account'}
           </Button>
         </form>
       </div>
