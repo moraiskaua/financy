@@ -1,25 +1,20 @@
 import { useState } from 'react';
-import { Transaction, Category, CreateTransactionInput } from '@/types';
+import type { CreateTransactionInput } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/utils/cn';
+import type { useTransactionsModel } from './use-transactions.model';
+import type { useCategoriesModel } from '@/features/categories/use-categories.model';
 
-interface TransactionsViewProps {
-  transactions: Transaction[];
-  categories: Category[];
-  isLoading: boolean;
-  error: string | null;
-  onCreate: (input: CreateTransactionInput) => Promise<boolean>;
-  onDelete: (id: string) => Promise<boolean>;
-}
+type TransactionsViewProps = ReturnType<typeof useTransactionsModel> & Pick<ReturnType<typeof useCategoriesModel>, 'categories'>;
 
 export function TransactionsView({
   transactions,
   categories,
   isLoading,
   error,
-  onCreate,
-  onDelete,
+  createTransaction,
+  deleteTransaction,
 }: TransactionsViewProps) {
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -37,7 +32,7 @@ export function TransactionsView({
       categoryId,
     };
     
-    const success = await onCreate(input);
+    const success = await createTransaction(input);
     if (success) {
       setDescription('');
       setAmount('');
@@ -129,7 +124,7 @@ export function TransactionsView({
             </div>
             <div className="ml-4 pl-4 border-l border-gray-100">
               <Button
-                onClick={() => onDelete(transaction.id)}
+                onClick={() => deleteTransaction(transaction.id)}
                 variant="danger"
                 size="sm"
                 disabled={isLoading}

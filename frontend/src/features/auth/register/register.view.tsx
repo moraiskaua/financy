@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { registerSchema, type RegisterFormData } from './register.schema';
@@ -21,10 +22,10 @@ export function RegisterView({ isLoading, error, onSubmit }: RegisterViewProps) 
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-800">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
@@ -34,8 +35,8 @@ export function RegisterView({ isLoading, error, onSubmit }: RegisterViewProps) 
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
           {error && (
-            <div className="rounded-md bg-red-light p-4">
-              <p className="text-sm text-red-dark">{error}</p>
+            <div className="rounded-md bg-red-50 p-4 border border-red-200">
+              <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
 
@@ -90,6 +91,13 @@ export function RegisterView({ isLoading, error, onSubmit }: RegisterViewProps) 
           >
             {isLoading ? 'Creating account...' : 'Create account'}
           </Button>
+
+          <div className="text-center text-sm">
+            <span className="text-gray-500">Already have an account? </span>
+            <Link to="/login" className="font-medium text-brand-base hover:text-brand-dark">
+              Sign in here
+            </Link>
+          </div>
         </form>
       </div>
     </div>

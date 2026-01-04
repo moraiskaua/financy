@@ -1,6 +1,6 @@
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 import { GET_CATEGORIES, CREATE_CATEGORY, UPDATE_CATEGORY, DELETE_CATEGORY } from '@/graphql/categories.queries';
-import { Category, CreateCategoryInput, UpdateCategoryInput } from '@/types';
+import type { Category, CreateCategoryInput, UpdateCategoryInput } from '@/types';
 import { useState } from 'react';
 
 export const useCategoriesModel = () => {

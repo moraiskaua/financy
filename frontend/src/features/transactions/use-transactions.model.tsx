@@ -1,6 +1,6 @@
-import { useQuery, useMutation } from '@apollo/client';
-import { GET_TRANSACTIONS, CREATE_TRANSACTION, UPDATE_TRANSACTION, DELETE_TRANSACTION } from '@/graphql/transactions.queries';
-import { Transaction, CreateTransactionInput, UpdateTransactionInput } from '@/types';
+import { CREATE_TRANSACTION, DELETE_TRANSACTION, GET_TRANSACTIONS, UPDATE_TRANSACTION } from '@/graphql/transactions.queries';
+import type { CreateTransactionInput, Transaction, UpdateTransactionInput } from '@/types';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { useState } from 'react';
 
 export const useTransactionsModel = () => {

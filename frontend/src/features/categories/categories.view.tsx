@@ -1,25 +1,18 @@
 import { useState } from 'react';
-import { Category } from '@/types';
+import type { Category } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/utils/cn';
+import type { useCategoriesModel } from './use-categories.model';
 
-interface CategoriesViewProps {
-  categories: Category[];
-  isLoading: boolean;
-  error: string | null;
-  onCreate: (name: string) => Promise<boolean>;
-  onUpdate: (id: string, name: string) => Promise<boolean>;
-  onDelete: (id: string) => Promise<boolean>;
-}
+type CategoriesViewProps = ReturnType<typeof useCategoriesModel>;
 
 export function CategoriesView({
   categories,
   isLoading,
   error,
-  onCreate,
-  onUpdate,
-  onDelete,
+  createCategory,
+  updateCategory,
+  deleteCategory,
 }: CategoriesViewProps) {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -29,7 +22,7 @@ export function CategoriesView({
     e.preventDefault();
     if (!newCategoryName.trim()) return;
     
-    const success = await onCreate(newCategoryName);
+    const success = await createCategory(newCategoryName);
     if (success) {
       setNewCategoryName('');
     }
@@ -48,7 +41,7 @@ export function CategoriesView({
   const handleUpdate = async () => {
     if (!editingId || !editingName.trim()) return;
     
-    const success = await onUpdate(editingId, editingName);
+    const success = await updateCategory(editingId, editingName);
     if (success) {
       setEditingId(null);
     }
@@ -119,7 +112,7 @@ export function CategoriesView({
                     Edit
                   </Button>
                   <Button
-                    onClick={() => onDelete(category.id)}
+                    onClick={() => deleteCategory(category.id)}
                     variant="danger"
                     size="sm"
                     disabled={isLoading}

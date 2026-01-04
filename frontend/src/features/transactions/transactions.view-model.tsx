@@ -3,31 +3,18 @@ import { useCategoriesModel } from '@/features/categories/use-categories.model';
 import { TransactionsView } from './transactions.view';
 
 export default function TransactionsViewModel() {
-  const {
-    transactions,
-    isLoading: isTransactionsLoading,
-    error: transactionsError,
-    createTransaction,
-    deleteTransaction,
-  } = useTransactionsModel();
+  const transactionsModel = useTransactionsModel();
+  const categoriesModel = useCategoriesModel();
 
-  const {
-    categories,
-    isLoading: isCategoriesLoading,
-    error: categoriesError,
-  } = useCategoriesModel();
-
-  const isLoading = isTransactionsLoading || isCategoriesLoading;
-  const error = transactionsError || categoriesError;
+  const isLoading = transactionsModel.isLoading || categoriesModel.isLoading;
+  const error = transactionsModel.error || categoriesModel.error;
 
   return (
     <TransactionsView
-      transactions={transactions}
-      categories={categories}
+      {...transactionsModel}
+      categories={categoriesModel.categories}
       isLoading={isLoading}
       error={error}
-      onCreate={createTransaction}
-      onDelete={deleteTransaction}
     />
   );
 }

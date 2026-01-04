@@ -1,11 +1,27 @@
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { ProtectedRoute } from './components/protected-route';
+import LoginViewModel from './features/auth/login/login.view-model';
+import RegisterViewModel from './features/auth/register/register.view-model';
+import CategoriesViewModel from './features/categories/categories.view-model';
+import DashboardViewModel from './features/dashboard/dashboard.view-model';
+import TransactionsViewModel from './features/transactions/transactions.view-model';
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Financy</h1>
-        <p className="text-gray-600">Personal Finance Management</p>
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginViewModel />} />
+        <Route path="/register" element={<RegisterViewModel />} />
+        
+        <Route element={<ProtectedRoute />}>
+           <Route element={<DashboardViewModel />}>
+             <Route path="/" element={<Navigate to="/transactions" replace />} />
+             <Route path="/transactions" element={<TransactionsViewModel />} />
+             <Route path="/categories" element={<CategoriesViewModel />} />
+           </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
