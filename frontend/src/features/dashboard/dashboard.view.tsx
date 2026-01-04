@@ -1,78 +1,76 @@
-import { Outlet, NavLink } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import logo from '@/assets/logo.svg';
+import { Link } from '@/components/ui/link';
 import { cn } from '@/utils/cn';
-import { Receipt, Tag, LogOut, User as UserIcon } from 'lucide-react';
+import { Outlet, useLocation } from 'react-router-dom';
 import type { useDashboardModel } from './use-dashboard.model';
 
 type DashboardViewProps = ReturnType<typeof useDashboardModel>;
 
-export function DashboardView({ user, logout }: DashboardViewProps) {
+export function DashboardView({ user }: DashboardViewProps) {
+  const location = useLocation();
+  const isDashboard = location.pathname === '/';
+  const isTransactions = location.pathname === '/transactions';
+  const isCategories = location.pathname === '/categories';
+
+  const getInitials = (name?: string) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white shadow-sm sticky top-0 z-10">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <span className="text-2xl font-bold text-brand-base">Financy</span>
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-8 flex-1">
+              <div className="flex items-center">
+                <img src={logo} alt="FINANCY" className="h-8" />
               </div>
-              <nav className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <NavLink
+              <nav className="hidden md:flex items-center gap-6 flex-1 justify-center">
+                <Link
+                  to="/"
+                  className={cn(
+                    'text-sm font-medium transition-colors',
+                    isDashboard ? 'text-brand-base' : 'text-gray-800 hover:text-brand-base'
+                  )}
+                >
+                  Dashboard
+                </Link>
+                <Link
                   to="/transactions"
-                  className={({ isActive }) =>
-                    cn(
-                      "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium",
-                      isActive
-                        ? "border-brand-base text-gray-900"
-                        : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                    )
-                  }
+                  className={cn(
+                    'text-sm font-medium transition-colors',
+                    isTransactions ? 'text-brand-base' : 'text-gray-800 hover:text-brand-base'
+                  )}
                 >
-                  <Receipt className="w-4 h-4 mr-2" />
-                  Transactions
-                </NavLink>
-                <NavLink
+                  Transações
+                </Link>
+                <Link
                   to="/categories"
-                  className={({ isActive }) =>
-                    cn(
-                      "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium",
-                      isActive
-                        ? "border-brand-base text-gray-900"
-                        : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                    )
-                  }
+                  className={cn(
+                    'text-sm font-medium transition-colors',
+                    isCategories ? 'text-brand-base' : 'text-gray-800 hover:text-brand-base'
+                  )}
                 >
-                  <Tag className="w-4 h-4 mr-2" />
-                  Categories
-                </NavLink>
+                  Categorias
+                </Link>
               </nav>
             </div>
             <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <div className="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand-dark">
-                      <UserIcon className="w-4 h-4" />
-                    </div>
-                    <span className="hidden md:inline">{user?.name || user?.email}</span>
-                  </div>
-                  <Button
-                    onClick={logout}
-                    variant="secondary"
-                    size="sm"
-                    className="ml-4"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
-                  </Button>
-                </div>
+              <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                <span className="text-sm font-medium text-white">{getInitials(user?.name)}</span>
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 py-10">
+      <main className="flex-1 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Outlet />
         </div>

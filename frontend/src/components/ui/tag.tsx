@@ -3,7 +3,7 @@ import { cn } from '@/utils/cn';
 export type TagVariant = 'gray' | 'blue' | 'purple' | 'pink' | 'red' | 'orange' | 'yellow' | 'green';
 
 export interface TagProps {
-  variant?: TagVariant;
+  variant?: TagVariant | string;
   children: React.ReactNode;
   className?: string;
 }
@@ -20,11 +20,12 @@ const variantStyles: Record<TagVariant, string> = {
 };
 
 export function Tag({ variant = 'gray', children, className }: TagProps) {
+  const safeVariant = variant in variantStyles ? (variant as TagVariant) : 'gray';
   return (
     <span
       className={cn(
         'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-        variantStyles[variant],
+        variantStyles[safeVariant],
         className
       )}
     >

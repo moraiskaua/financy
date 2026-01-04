@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
-import { User as UserIcon, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import logo from '@/assets/logo.svg';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowRight, Eye, EyeOff, Lock, Mail, User as UserIcon } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { registerSchema, type RegisterFormData } from './register.schema';
 import type { useRegisterModel } from './use-register.model';
-import logo from '@/assets/logo.svg';
 
 type RegisterViewProps = ReturnType<typeof useRegisterModel>;
 

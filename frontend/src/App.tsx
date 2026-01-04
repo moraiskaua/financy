@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginViewModel from './features/auth/login/login.view-model';
 import RegisterViewModel from './features/auth/register/register.view-model';
 import DashboardViewModel from './features/dashboard/dashboard.view-model';
+import HomeViewModel from './features/dashboard/home.view-model';
 import CategoriesViewModel from './features/categories/categories.view-model';
 import TransactionsViewModel from './features/transactions/transactions.view-model';
 import { ProtectedRoute } from './components/protected-route';
@@ -18,7 +19,7 @@ function App() {
         
         <Route element={<ProtectedRoute />}>
            <Route element={<DashboardViewModel />}>
-             <Route path="/" element={<Navigate to="/transactions" replace />} />
+             <Route path="/" element={<HomeViewModel />} />
              <Route path="/transactions" element={<TransactionsViewModel />} />
              <Route path="/categories" element={<CategoriesViewModel />} />
            </Route>

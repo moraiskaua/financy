@@ -1,136 +1,205 @@
-import { useState } from 'react';
-import type { Category } from '@/types';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/utils/cn';
+import {
+    ArrowUpDown,
+    Car,
+    Edit2,
+    Heart,
+    Home,
+    Plus,
+    ShoppingCart,
+    Tag,
+    Trash2,
+    Utensils,
+    Wallet,
+    Zap
+} from 'lucide-react';
 import type { useCategoriesModel } from './use-categories.model';
 
 type CategoriesViewProps = ReturnType<typeof useCategoriesModel>;
+
+const getCategoryIcon = (name: string) => {
+  const lower = name.toLowerCase();
+  if (lower.includes('aliment')) return Utensils;
+  if (lower.includes('entreten')) return Tag;
+  if (lower.includes('invest')) return Wallet;
+  if (lower.includes('mercado')) return ShoppingCart;
+  if (lower.includes('salário') || lower.includes('salario')) return Wallet;
+  if (lower.includes('saúde') || lower.includes('saude')) return Heart;
+  if (lower.includes('transporte')) return Car;
+  if (lower.includes('utilidades')) return Zap;
+  if (lower.includes('casa') || lower.includes('moradia')) return Home;
+  return Tag;
+};
 
 export function CategoriesView({
   categories,
   isLoading,
   error,
-  createCategory,
-  updateCategory,
+  totalTransactions,
+  mostUsedCategoryName,
+  categoryCounts,
+  newCategoryName,
+  editingId,
+  editingName,
+  isCreateModalOpen,
+  setNewCategoryName,
+  setEditingName,
+  setIsCreateModalOpen,
+  onCreateSubmit,
+  onStartEditing,
+  onCancelEditing,
+  onUpdateSubmit,
   deleteCategory,
 }: CategoriesViewProps) {
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingName, setEditingName] = useState('');
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newCategoryName.trim()) return;
-    
-    const success = await createCategory(newCategoryName);
-    if (success) {
-      setNewCategoryName('');
-    }
-  };
-
-  const startEditing = (category: Category) => {
-    setEditingId(category.id);
-    setEditingName(category.name);
-  };
-
-  const cancelEditing = () => {
-    setEditingId(null);
-    setEditingName('');
-  };
-
-  const handleUpdate = async () => {
-    if (!editingId || !editingName.trim()) return;
-    
-    const success = await updateCategory(editingId, editingName);
-    if (success) {
-      setEditingId(null);
-    }
-  };
+  
+  if (error) {
+    return (
+      <div className="p-6 text-center text-red-600">
+        Error: {error}
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900">Categories</h1>
-
-      {error && (
-        <div className="bg-red-50 text-danger p-4 rounded-md mb-6">
-          {error}
+    <div className="p-8 max-w-7xl mx-auto bg-gray-50 min-h-screen">
+      <div className="flex justify-between items-start mb-8">
+        <div>
+            <h1 className="text-3xl font-bold text-gray-900">Categorias</h1>
+            <p className="text-gray-500 mt-1">Organize suas transações por categorias</p>
         </div>
-      )}
-
-      <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
-        <h2 className="text-lg font-semibold mb-4 text-gray-800">New Category</h2>
-        <form onSubmit={handleCreate} className="flex gap-4">
-          <Input
-            placeholder="Category Name"
-            value={newCategoryName}
-            onChange={(e) => setNewCategoryName(e.target.value)}
-            disabled={isLoading}
-            className="flex-1"
-          />
-          <Button type="submit" disabled={isLoading || !newCategoryName.trim()}>
-            {isLoading ? 'Creating...' : 'Add Category'}
-          </Button>
-        </form>
+        <Button onClick={() => setIsCreateModalOpen(true)} className="bg-green-600 hover:bg-green-700 text-white border-none">
+            <Plus className="w-4 h-4 mr-2" />
+            Nova categoria
+        </Button>
       </div>
 
-      <div className="space-y-4">
-        {categories.map((category) => (
-          <div
-            key={category.id}
-            className="bg-white p-4 rounded-lg shadow-sm flex items-center justify-between"
-          >
-            {editingId === category.id ? (
-              <div className="flex-1 flex gap-4 mr-4">
-                <Input
-                  value={editingName}
-                  onChange={(e) => setEditingName(e.target.value)}
-                  disabled={isLoading}
-                  autoFocus
-                />
-                <Button onClick={handleUpdate} disabled={isLoading} size="sm">
-                  Save
-                </Button>
-                <Button
-                  onClick={cancelEditing}
-                  variant="secondary"
-                  size="sm"
-                  disabled={isLoading}
-                >
-                  Cancel
-                </Button>
-              </div>
-            ) : (
-              <>
-                <span className="text-gray-700 font-medium">{category.name}</span>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => startEditing(category)}
-                    variant="secondary"
-                    size="sm"
-                    disabled={isLoading}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    onClick={() => deleteCategory(category.id)}
-                    variant="danger"
-                    size="sm"
-                    disabled={isLoading}
-                  >
-                    Delete
-                  </Button>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div className="p-3 bg-gray-50 rounded-lg">
+                <Tag className="w-6 h-6 text-gray-600" />
+            </div>
+            <div>
+                <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
+                <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">Total de categorias</p>
+            </div>
+        </div>
+        
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div className="p-3 bg-purple-50 rounded-lg">
+                <ArrowUpDown className="w-6 h-6 text-purple-600" />
+            </div>
+            <div>
+                <p className="text-2xl font-bold text-gray-900">{totalTransactions}</p>
+                <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">Total de transações</p>
+            </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div className="p-3 bg-blue-50 rounded-lg">
+                <Utensils className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+                <p className="text-lg font-bold text-gray-900">{mostUsedCategoryName}</p>
+                <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">Categoria mais utilizada</p>
+            </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {categories.map((category) => {
+            const Icon = getCategoryIcon(category.name);
+            const count = categoryCounts[category.id] || 0;
+            return (
+                <div key={category.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start mb-4">
+                        <div className={cn("p-3 rounded-lg bg-blue-50 text-blue-600")}>
+                            <Icon className="w-6 h-6" />
+                        </div>
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={() => deleteCategory(category.id)}
+                                className="p-2 text-red-400 hover:bg-red-50 rounded-lg transition-colors"
+                                disabled={isLoading}
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                            <button 
+                                onClick={() => onStartEditing(category)}
+                                className="p-2 text-gray-400 hover:bg-gray-50 rounded-lg transition-colors"
+                                disabled={isLoading}
+                            >
+                                <Edit2 className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <h3 className="font-bold text-gray-900 mb-1">{category.name}</h3>
+                    
+                    <div className="flex justify-between items-center mt-4">
+                        <span className="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded-full">
+                            {category.name}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                            {count} {count === 1 ? 'item' : 'itens'}
+                        </span>
+                    </div>
                 </div>
-              </>
-            )}
-          </div>
-        ))}
+            );
+        })}
         
         {categories.length === 0 && !isLoading && (
-          <div className="text-center text-gray-500 py-8">
-            No categories found. Create one to get started.
-          </div>
+            <div className="col-span-full text-center py-12 text-gray-500">
+                Nenhuma categoria encontrada. Crie uma nova para começar.
+            </div>
         )}
       </div>
+
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Nova Categoria</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={onCreateSubmit} className="space-y-4 mt-4">
+                <div>
+                    <Input 
+                        placeholder="Nome da categoria" 
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                        autoFocus
+                    />
+                </div>
+                <DialogFooter>
+                    <Button type="button" variant="ghost" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+                    <Button type="submit" disabled={isLoading || !newCategoryName.trim()}>Criar</Button>
+                </DialogFooter>
+            </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!editingId} onOpenChange={(open) => !open && onCancelEditing()}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Editar Categoria</DialogTitle>
+            </DialogHeader>
+             <form onSubmit={(e) => { e.preventDefault(); onUpdateSubmit(); }} className="space-y-4 mt-4">
+                <div>
+                    <Input 
+                        placeholder="Nome da categoria" 
+                        value={editingName}
+                        onChange={(e) => setEditingName(e.target.value)}
+                        autoFocus
+                    />
+                </div>
+                <DialogFooter>
+                    <Button type="button" variant="ghost" onClick={onCancelEditing}>Cancelar</Button>
+                    <Button type="submit" disabled={isLoading || !editingName.trim()}>Salvar</Button>
+                </DialogFooter>
+            </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
