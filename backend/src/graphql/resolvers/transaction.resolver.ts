@@ -145,8 +145,13 @@ export const transactionResolvers = {
       const category = await prisma.category.findUnique({
         where: { id: parent.categoryId },
       });
-
       return category;
+    },
+    createdAt: (parent: Transaction): string => {
+      return new Date(parent.createdAt).toISOString();
+    },
+    updatedAt: (parent: Transaction): string => {
+      return new Date(parent.updatedAt).toISOString();
     },
   },
 };

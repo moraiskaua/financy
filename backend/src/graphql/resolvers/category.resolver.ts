@@ -109,4 +109,12 @@ export const categoryResolvers = {
       return true;
     },
   },
+  Category: {
+    createdAt: (parent: Category): string => {
+      return new Date(parent.createdAt).toISOString();
+    },
+    updatedAt: (parent: Category): string => {
+      return new Date(parent.updatedAt).toISOString();
+    },
+  },
 };

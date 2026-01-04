@@ -16,4 +16,10 @@ export const resolvers = {
   Transaction: {
     ...transactionResolvers.Transaction,
   },
+  Category: {
+    ...categoryResolvers.Category,
+  },
+  User: {
+    ...authResolvers.User,
+  },
 };

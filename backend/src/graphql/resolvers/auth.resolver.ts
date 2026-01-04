@@ -98,4 +98,12 @@ export const authResolvers = {
       return updated;
     },
   },
+  User: {
+    createdAt: (parent: User): string => {
+      return new Date(parent.createdAt).toISOString();
+    },
+    updatedAt: (parent: User): string => {
+      return new Date(parent.updatedAt).toISOString();
+    },
+  },
 };
