@@ -1,10 +1,12 @@
 import { GraphQLError } from 'graphql';
 import { prisma } from '../../config/database';
 import { hashPassword, comparePassword, generateToken, getUserIdFromContext } from '../../utils/auth';
+import { Context, RegisterInput, LoginInput, AuthPayload } from '../../types/context';
+import { User } from '@prisma/client';
 
 export const authResolvers = {
   Query: {
-    me: async (_: any, __: any, context: any) => {
+    me: async (_: unknown, __: unknown, context: Context): Promise<User> => {
       const userId = getUserIdFromContext(context);
 
       const user = await prisma.user.findUnique({
@@ -21,7 +23,7 @@ export const authResolvers = {
     },
   },
   Mutation: {
-    register: async (_: any, { input }: any) => {
+    register: async (_: unknown, { input }: { input: RegisterInput }): Promise<AuthPayload> => {
       const { email, password } = input;
 
       const existingUser = await prisma.user.findUnique({
@@ -47,7 +49,7 @@ export const authResolvers = {
 
       return { token, user };
     },
-    login: async (_: any, { input }: any) => {
+    login: async (_: unknown, { input }: { input: LoginInput }): Promise<AuthPayload> => {
       const { email, password } = input;
 
       const user = await prisma.user.findUnique({

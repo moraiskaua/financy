@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
+import { Context } from '../types/context';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -28,7 +29,7 @@ export const verifyToken = (token: string): { userId: string } | null => {
   }
 };
 
-export const getUserIdFromContext = (context: any): string => {
+export const getUserIdFromContext = (context: Context): string => {
   const token = context.token.replace('Bearer ', '');
 
   if (!token) {

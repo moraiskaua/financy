@@ -1,10 +1,12 @@
 import { GraphQLError } from 'graphql';
 import { prisma } from '../../config/database';
 import { getUserIdFromContext } from '../../utils/auth';
+import { Context, CreateCategoryInput, UpdateCategoryInput } from '../../types/context';
+import { Category } from '@prisma/client';
 
 export const categoryResolvers = {
   Query: {
-    categories: async (_: any, __: any, context: any) => {
+    categories: async (_: unknown, __: unknown, context: Context): Promise<Category[]> => {
       const userId = getUserIdFromContext(context);
 
       const categories = await prisma.category.findMany({
@@ -14,7 +16,7 @@ export const categoryResolvers = {
 
       return categories;
     },
-    category: async (_: any, { id }: any, context: any) => {
+    category: async (_: unknown, { id }: { id: string }, context: Context): Promise<Category> => {
       const userId = getUserIdFromContext(context);
 
       const category = await prisma.category.findFirst({
@@ -31,7 +33,7 @@ export const categoryResolvers = {
     },
   },
   Mutation: {
-    createCategory: async (_: any, { input }: any, context: any) => {
+    createCategory: async (_: unknown, { input }: { input: CreateCategoryInput }, context: Context): Promise<Category> => {
       const userId = getUserIdFromContext(context);
       const { name } = input;
 
@@ -54,7 +56,7 @@ export const categoryResolvers = {
 
       return category;
     },
-    updateCategory: async (_: any, { id, input }: any, context: any) => {
+    updateCategory: async (_: unknown, { id, input }: { id: string; input: UpdateCategoryInput }, context: Context): Promise<Category> => {
       const userId = getUserIdFromContext(context);
       const { name } = input;
 
@@ -89,7 +91,7 @@ export const categoryResolvers = {
 
       return updatedCategory;
     },
-    deleteCategory: async (_: any, { id }: any, context: any) => {
+    deleteCategory: async (_: unknown, { id }: { id: string }, context: Context): Promise<boolean> => {
       const userId = getUserIdFromContext(context);
 
       const category = await prisma.category.findFirst({

@@ -1,10 +1,20 @@
+import { Category, Transaction } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { prisma } from '../../config/database';
+import {
+  Context,
+  CreateTransactionInput,
+  UpdateTransactionInput,
+} from '../../types/context';
 import { getUserIdFromContext } from '../../utils/auth';
 
 export const transactionResolvers = {
   Query: {
-    transactions: async (_: any, __: any, context: any) => {
+    transactions: async (
+      _: unknown,
+      __: unknown,
+      context: Context
+    ): Promise<Transaction[]> => {
       const userId = getUserIdFromContext(context);
 
       const transactions = await prisma.transaction.findMany({
@@ -14,7 +24,11 @@ export const transactionResolvers = {
 
       return transactions;
     },
-    transaction: async (_: any, { id }: any, context: any) => {
+    transaction: async (
+      _: unknown,
+      { id }: { id: string },
+      context: Context
+    ): Promise<Transaction> => {
       const userId = getUserIdFromContext(context);
 
       const transaction = await prisma.transaction.findFirst({
@@ -31,7 +45,11 @@ export const transactionResolvers = {
     },
   },
   Mutation: {
-    createTransaction: async (_: any, { input }: any, context: any) => {
+    createTransaction: async (
+      _: unknown,
+      { input }: { input: CreateTransactionInput },
+      context: Context
+    ): Promise<Transaction> => {
       const userId = getUserIdFromContext(context);
       const { description, amount, type, categoryId } = input;
 
@@ -57,7 +75,11 @@ export const transactionResolvers = {
 
       return transaction;
     },
-    updateTransaction: async (_: any, { id, input }: any, context: any) => {
+    updateTransaction: async (
+      _: unknown,
+      { id, input }: { id: string; input: UpdateTransactionInput },
+      context: Context
+    ): Promise<Transaction> => {
       const userId = getUserIdFromContext(context);
 
       const transaction = await prisma.transaction.findFirst({
@@ -94,7 +116,11 @@ export const transactionResolvers = {
 
       return updatedTransaction;
     },
-    deleteTransaction: async (_: any, { id }: any, context: any) => {
+    deleteTransaction: async (
+      _: unknown,
+      { id }: { id: string },
+      context: Context
+    ): Promise<boolean> => {
       const userId = getUserIdFromContext(context);
 
       const transaction = await prisma.transaction.findFirst({
@@ -115,7 +141,7 @@ export const transactionResolvers = {
     },
   },
   Transaction: {
-    category: async (parent: any) => {
+    category: async (parent: Transaction): Promise<Category | null> => {
       const category = await prisma.category.findUnique({
         where: { id: parent.categoryId },
       });
