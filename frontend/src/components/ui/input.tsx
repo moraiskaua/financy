@@ -1,27 +1,89 @@
 import { cn } from '@/utils/cn';
-import { type InputHTMLAttributes, forwardRef } from 'react';
+import { type LucideIcon } from 'lucide-react';
+import { type InputHTMLAttributes, forwardRef, useState } from 'react';
 
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'disabled'> {
+  label?: string;
+  helper?: string;
   error?: string;
+  icon?: LucideIcon;
+  disabled?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, error, ...props }, ref) => {
+  ({ className, label, helper, error, icon: Icon, disabled, onFocus, onBlur, ...props }, ref) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const hasError = !!error;
+    const hasValue = !!props.value || (typeof props.value === 'string' && props.value.length > 0);
+    const isActive = isFocused;
+    
+    const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(true);
+      onFocus?.(e);
+    };
+
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(false);
+      onBlur?.(e);
+    };
+    
     return (
       <div className="w-full">
-        <input
-          ref={ref}
-          className={cn(
-            'w-full px-3 py-2 border rounded-md text-sm transition-colors',
-            'focus:outline-none focus:ring-2 focus:ring-brand-base focus:border-brand-base',
-            'disabled:opacity-50 disabled:cursor-not-allowed',
-            error ? 'border-danger focus:ring-danger' : 'border-gray-300',
-            className
+        {label && (
+          <label
+            htmlFor={props.id}
+            className={cn(
+              'block text-sm font-medium mb-1 transition-colors',
+              isActive && !hasError ? 'text-brand-base' : hasError ? 'text-danger' : 'text-gray-800'
+            )}
+          >
+            {label}
+          </label>
+        )}
+        <div className="relative">
+          {Icon && (
+            <Icon
+              className={cn(
+                'absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors',
+                disabled
+                  ? 'text-gray-500'
+                  : isActive && !hasError
+                    ? 'text-brand-base'
+                    : hasError
+                      ? 'text-danger'
+                      : hasValue
+                        ? 'text-gray-800'
+                        : 'text-gray-400'
+              )}
+            />
           )}
-          {...props}
-        />
-        {error && (
-          <p className="mt-1 text-sm text-danger">{error}</p>
+          <input
+            ref={ref}
+            disabled={disabled}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            className={cn(
+              'w-full rounded-md text-sm transition-colors',
+              'focus:outline-none focus:ring-2 focus:ring-offset-0',
+              Icon ? 'pl-10 pr-3 py-2' : 'px-3 py-2',
+              disabled
+                ? 'bg-gray-100 border-gray-300 text-gray-800 cursor-not-allowed opacity-50'
+                : hasError
+                  ? 'border border-danger text-gray-800 focus:border-danger focus:ring-danger'
+                  : isActive
+                    ? 'border border-brand-base text-gray-800 focus:border-brand-base focus:ring-brand-base'
+                    : hasValue
+                      ? 'border border-gray-300 text-gray-800 focus:border-brand-base focus:ring-brand-base'
+                      : 'border border-gray-300 text-gray-800 placeholder:text-gray-400 focus:border-brand-base focus:ring-brand-base',
+              className
+            )}
+            {...props}
+          />
+        </div>
+        {(helper || error) && (
+          <p className={cn('mt-1 text-sm', error ? 'text-danger' : 'text-gray-500')}>
+            {error || helper}
+          </p>
         )}
       </div>
     );

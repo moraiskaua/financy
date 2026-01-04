@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { apolloClient } from '@/config/apollo-client';
 import { LOGIN_MUTATION } from '@/graphql/auth.queries';
 import type { LoginInput } from '@/types';
 
 export const useLoginModel = () => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,6 +25,7 @@ export const useLoginModel = () => {
 
       if (data?.login) {
         localStorage.setItem('token', data.login.token);
+        navigate('/');
         return true;
       }
 
@@ -33,7 +36,7 @@ export const useLoginModel = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [navigate]);
 
   return {
     isLoading,

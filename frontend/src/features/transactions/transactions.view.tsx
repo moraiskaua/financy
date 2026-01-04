@@ -3,10 +3,9 @@ import type { CreateTransactionInput } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/utils/cn';
-import type { useTransactionsModel } from './use-transactions.model';
-import type { useCategoriesModel } from '@/features/categories/use-categories.model';
+import type { useTransactionsPageModel } from './use-transactions-page.model';
 
-type TransactionsViewProps = ReturnType<typeof useTransactionsModel> & Pick<ReturnType<typeof useCategoriesModel>, 'categories'>;
+type TransactionsViewProps = ReturnType<typeof useTransactionsPageModel>;
 
 export function TransactionsView({
   transactions,

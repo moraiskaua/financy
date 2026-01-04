@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { apolloClient } from '@/config/apollo-client';
 import { REGISTER_MUTATION } from '@/graphql/auth.queries';
 import type { RegisterInput } from '@/types';
 
 export const useRegisterModel = () => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,6 +25,7 @@ export const useRegisterModel = () => {
 
       if (data?.register) {
         localStorage.setItem('token', data.register.token);
+        navigate('/');
         return true;
       }
 
@@ -33,7 +36,7 @@ export const useRegisterModel = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [navigate]);
 
   return {
     isLoading,
