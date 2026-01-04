@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { CreateTransactionInput } from '@/types';
+import type { CreateTransactionInput, UpdateTransactionInput, Transaction } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -14,31 +14,54 @@ export function TransactionsView({
   isLoading,
   error,
   createTransaction,
+  updateTransaction,
   deleteTransaction,
 }: TransactionsViewProps) {
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('EXPENSE');
   const [categoryId, setCategoryId] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const resetForm = () => {
+    setDescription('');
+    setAmount('');
+    setCategoryId('');
+    setType('EXPENSE');
+    setEditingId(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description || !amount || !categoryId) return;
 
-    const input: CreateTransactionInput = {
-      description,
-      amount: parseFloat(amount),
-      type,
-      categoryId,
-    };
-    
-    const success = await createTransaction(input);
-    if (success) {
-      setDescription('');
-      setAmount('');
-      setCategoryId('');
-      setType('EXPENSE');
+    if (editingId) {
+      const input: UpdateTransactionInput = {
+        description,
+        amount: parseFloat(amount),
+        type,
+        categoryId,
+      };
+      const success = await updateTransaction(editingId, input);
+      if (success) resetForm();
+    } else {
+      const input: CreateTransactionInput = {
+        description,
+        amount: parseFloat(amount),
+        type,
+        categoryId,
+      };
+      const success = await createTransaction(input);
+      if (success) resetForm();
     }
+  };
+
+  const startEditing = (transaction: Transaction) => {
+    setEditingId(transaction.id);
+    setDescription(transaction.description);
+    setAmount(transaction.amount.toString());
+    setType(transaction.type);
+    setCategoryId(transaction.categoryId);
   };
 
   const typeOptions = [
@@ -62,8 +85,17 @@ export function TransactionsView({
       )}
 
       <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
-        <h2 className="text-lg font-semibold mb-4 text-gray-800">New Transaction</h2>
-        <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-gray-800">
+            {editingId ? 'Edit Transaction' : 'New Transaction'}
+          </h2>
+          {editingId && (
+            <Button variant="secondary" size="sm" onClick={resetForm} disabled={isLoading}>
+              Cancel Editing
+            </Button>
+          )}
+        </div>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <Input
             placeholder="Description"
             value={description}
@@ -94,7 +126,7 @@ export function TransactionsView({
             placeholder="Category"
           />
           <Button type="submit" disabled={isLoading || !description || !amount || !categoryId} className="lg:col-span-5">
-            {isLoading ? 'Creating...' : 'Add Transaction'}
+            {isLoading ? (editingId ? 'Updating...' : 'Creating...') : (editingId ? 'Update Transaction' : 'Add Transaction')}
           </Button>
         </form>
       </div>
@@ -124,7 +156,15 @@ export function TransactionsView({
                 </div>
               </div>
             </div>
-            <div className="ml-4 pl-4 border-l border-gray-100">
+            <div className="ml-4 pl-4 border-l border-gray-100 flex gap-2">
+              <Button
+                onClick={() => startEditing(transaction)}
+                variant="secondary"
+                size="sm"
+                disabled={isLoading}
+              >
+                Edit
+              </Button>
               <Button
                 onClick={() => deleteTransaction(transaction.id)}
                 variant="danger"
