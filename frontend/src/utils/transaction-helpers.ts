@@ -109,12 +109,34 @@ export function formatCurrency(value: number): string {
   }).format(value);
 }
 
-export function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  if (!dateString || isNaN(date.getTime())) return '-';
+export function formatDate(input: string | Date | number | undefined | null): string {
+  if (!input) return '-';
+  const date = parseDate(input);
+  if (!date) return '-';
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
     month: '2-digit',
     year: '2-digit',
   }).format(date);
+}
+
+export function parseDate(input: string | Date | number | undefined | null): Date | null {
+  if (!input) return null;
+  if (input instanceof Date) {
+    const time = input.getTime();
+    return isNaN(time) ? null : input;
+  }
+  if (typeof input === 'number') {
+    const d = new Date(input);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  let s = String(input);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    s = `${s}T00:00:00`;
+  }
+  if (s.includes(' ') && !s.includes('T')) {
+    s = s.replace(' ', 'T');
+  }
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
 }

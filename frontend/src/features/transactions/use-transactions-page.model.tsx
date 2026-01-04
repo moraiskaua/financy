@@ -1,6 +1,6 @@
 import { useCategoriesModel } from '@/features/categories/use-categories.model';
 import type { Transaction } from '@/types';
-import { getCategoryColor, getIconByName } from '@/utils/transaction-helpers';
+import { getCategoryColor, getIconByName, parseDate } from '@/utils/transaction-helpers';
 import { useMemo, useState } from 'react';
 import { useTransactionsModel } from './use-transactions.model';
 
@@ -92,16 +92,17 @@ export const useTransactionsPageModel = () => {
         const matchesType = !filterType || transaction.type === filterType;
         const matchesCategory =
           !filterCategory || transaction.categoryId === filterCategory;
-        const d = new Date(transaction.createdAt);
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const period = `${y}-${m}`;
-        const matchesPeriod = !filterPeriod || period === filterPeriod;
+        const d = parseDate(transaction.createdAt || transaction.updatedAt);
+        const period = d ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` : null;
+        const matchesPeriod = !filterPeriod || (period !== null && period === filterPeriod);
         return matchesSearch && matchesType && matchesCategory && matchesPeriod;
       })
       .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        (a, b) => {
+          const db = parseDate(b.createdAt || b.updatedAt)?.getTime() ?? 0;
+          const da = parseDate(a.createdAt || a.updatedAt)?.getTime() ?? 0;
+          return db - da;
+        }
       );
   }, [
     transactionsModel.transactions,
@@ -132,6 +133,7 @@ export const useTransactionsPageModel = () => {
   }, [filteredTransactions, currentPage, categoriesModel.categories]);
 
   const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
+  const totalCount = filteredTransactions.length;
   const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
   const endItem = Math.min(
     currentPage * ITEMS_PER_PAGE,
@@ -248,6 +250,7 @@ export const useTransactionsPageModel = () => {
     currentPage,
     startItem,
     endItem,
+    totalCount,
     resetFilters,
     handlePageChange,
     handleFilterChange,

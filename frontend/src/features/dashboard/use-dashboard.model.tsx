@@ -5,6 +5,7 @@ import type { Category, Transaction, User } from '@/types';
 import {
   getCategoryColor,
   getIconByName,
+  parseDate,
 } from '@/utils/transaction-helpers';
 import { useQuery } from '@apollo/client/react';
 import { useMemo, useState } from 'react';
@@ -49,7 +50,8 @@ export const useDashboardModel = () => {
 
   const { totalBalance, monthlyIncome, monthlyExpenses } = useMemo(() => {
     const monthlyTransactions = transactions.filter((t) => {
-      const date = new Date(t.createdAt);
+      const date = parseDate(t.createdAt || t.updatedAt);
+      if (!date) return false;
       return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
     });
 
@@ -71,7 +73,11 @@ export const useDashboardModel = () => {
   }, [transactions, currentMonth, currentYear]);
 
   const recentTransactions = useMemo(() => {
-    const sorted = [...transactions].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const sorted = [...transactions].sort((a, b) => {
+      const db = parseDate(b.createdAt || b.updatedAt)?.getTime() ?? 0;
+      const da = parseDate(a.createdAt || a.updatedAt)?.getTime() ?? 0;
+      return db - da;
+    });
     return sorted
       .slice(0, RECENT_TRANSACTIONS_LIMIT)
       .map((transaction) => {

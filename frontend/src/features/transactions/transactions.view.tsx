@@ -45,6 +45,7 @@ export function TransactionsView({
   currentPage,
   startItem,
   endItem,
+  totalCount,
   
   isCreateDialogOpen,
   setIsCreateDialogOpen,
@@ -241,9 +242,9 @@ export function TransactionsView({
         {!isLoading && paginatedTransactions.length > 0 && (
           <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50">
             <div className="text-sm text-gray-500">
-              Mostrando <span className="font-medium">{startItem}</span> a{' '}
-              <span className="font-medium">{endItem}</span> de{' '}
-              <span className="font-medium">{totalPages}</span> resultados
+              <span className="font-medium">{startItem}</span> a{' '}
+              <span className="font-medium">{endItem}</span> {' '}|{' '}
+              <span className="font-medium">{totalCount}</span> resultados
             </div>
             <div className="flex space-x-2">
               <PaginationButton
