@@ -47,9 +47,11 @@ export function DashboardView({ isDashboard, isTransactions, isCategories, userI
               </nav>
             </div>
             <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
-                <span className="text-sm font-medium text-white">{userInitials}</span>
-              </div>
+              <Link to="/profile">
+                <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center hover:bg-gray-400 transition-colors cursor-pointer">
+                  <span className="text-sm font-medium text-white">{userInitials}</span>
+                </div>
+              </Link>
             </div>
           </div>
         </div>

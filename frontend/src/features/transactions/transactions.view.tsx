@@ -25,6 +25,7 @@ import {
   TrendingDown,
   TrendingUp,
 } from 'lucide-react';
+import { CreateTransactionDialog } from './components/create-transaction-dialog';
 import type { useTransactionsPageModel } from './use-transactions-page.model';
 
 type TransactionsViewProps = ReturnType<typeof useTransactionsPageModel>;
@@ -44,6 +45,8 @@ export function TransactionsView({
   startItem,
   endItem,
   
+  isCreateDialogOpen,
+  setIsCreateDialogOpen,
   isDialogOpen,
   setIsDialogOpen,
   editingId,
@@ -63,7 +66,6 @@ export function TransactionsView({
   handleSearchChange,
   handleTypeFilterChange,
   handleCategoryFilterChange,
-  resetForm,
 }: TransactionsViewProps) {
 
   return (
@@ -76,13 +78,13 @@ export function TransactionsView({
           </p>
         </div>
         <Button
-          variant="primary"
-          size="md"
-          icon={Plus}
-          onClick={() => setIsDialogOpen(true)}
-        >
-          Nova transação
-        </Button>
+            variant="primary"
+            size="md"
+            icon={Plus}
+            onClick={() => setIsCreateDialogOpen(true)}
+          >
+            Nova transação
+          </Button>
       </div>
 
       {error && (
@@ -268,14 +270,20 @@ export function TransactionsView({
         )}
       </div>
 
+      <CreateTransactionDialog
+        isOpen={isCreateDialogOpen}
+        onClose={() => setIsCreateDialogOpen(false)}
+        onSuccess={() => setIsCreateDialogOpen(false)}
+      />
+
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              {editingId ? 'Editar Transação' : 'Nova Transação'}
+              Editar Transação
             </DialogTitle>
             <DialogDescription>
-              Preencha os detalhes da transação abaixo.
+              Edite os detalhes da transação abaixo.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 py-4">
@@ -318,13 +326,12 @@ export function TransactionsView({
                 type="button"
                 onClick={() => {
                   setIsDialogOpen(false);
-                  resetForm();
                 }}
               >
                 Cancelar
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Salvando...' : editingId ? 'Salvar' : 'Adicionar'}
+                {isLoading ? 'Salvando...' : 'Salvar'}
               </Button>
             </DialogFooter>
           </form>

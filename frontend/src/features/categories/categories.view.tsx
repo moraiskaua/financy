@@ -10,6 +10,7 @@ import {
     Trash2,
     Utensils
 } from 'lucide-react';
+import { CreateCategoryDialog } from './components/create-category-dialog';
 import type { useCategoriesModel } from './use-categories.model';
 
 type CategoriesViewProps = ReturnType<typeof useCategoriesModel>;
@@ -20,14 +21,11 @@ export function CategoriesView({
   error,
   totalTransactions,
   mostUsedCategoryName,
-  newCategoryName,
   editingId,
   editingName,
   isCreateModalOpen,
-  setNewCategoryName,
   setEditingName,
   setIsCreateModalOpen,
-  onCreateSubmit,
   onStartEditing,
   onCancelEditing,
   onUpdateSubmit,
@@ -50,8 +48,12 @@ export function CategoriesView({
             <h1 className="text-3xl font-bold text-gray-900">Categorias</h1>
             <p className="text-gray-500 mt-1">Organize suas transações por categorias</p>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)} className="bg-green-600 hover:bg-green-700 text-white border-none">
-            <Plus className="w-4 h-4 mr-2" />
+        <Button
+            variant="primary"
+            size="md"
+            icon={Plus}
+            onClick={() => setIsCreateModalOpen(true)}
+        >
             Nova categoria
         </Button>
       </div>
@@ -135,27 +137,11 @@ export function CategoriesView({
         )}
       </div>
 
-      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent>
-            <DialogHeader>
-                <DialogTitle>Nova Categoria</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={onCreateSubmit} className="space-y-4 mt-4">
-                <div>
-                    <Input 
-                        placeholder="Nome da categoria" 
-                        value={newCategoryName}
-                        onChange={(e) => setNewCategoryName(e.target.value)}
-                        autoFocus
-                    />
-                </div>
-                <DialogFooter>
-                    <Button type="button" variant="ghost" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
-                    <Button type="submit" disabled={isLoading || !newCategoryName.trim()}>Criar</Button>
-                </DialogFooter>
-            </form>
-        </DialogContent>
-      </Dialog>
+      <CreateCategoryDialog
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => setIsCreateModalOpen(false)}
+      />
 
       <Dialog open={!!editingId} onOpenChange={(open) => !open && onCancelEditing()}>
         <DialogContent>

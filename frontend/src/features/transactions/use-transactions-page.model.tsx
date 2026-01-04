@@ -35,6 +35,7 @@ export const useTransactionsPageModel = () => {
   const [filterCategory, setFilterCategory] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [description, setDescription] = useState('');
@@ -161,14 +162,6 @@ export const useTransactionsPageModel = () => {
         categoryId,
       });
       if (success) resetForm();
-    } else {
-      const success = await transactionsModel.createTransaction({
-        description,
-        amount: parseFloat(amount),
-        type,
-        categoryId,
-      });
-      if (success) resetForm();
     }
   };
 
@@ -211,6 +204,8 @@ export const useTransactionsPageModel = () => {
     handlePageChange,
     handleFilterChange,
     
+    isCreateDialogOpen,
+    setIsCreateDialogOpen,
     isDialogOpen,
     setIsDialogOpen,
     editingId,

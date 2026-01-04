@@ -16,7 +16,6 @@ export const useCategoriesModel = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [newCategoryName, setNewCategoryName] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -112,16 +111,6 @@ export const useCategoriesModel = () => {
     }
   };
 
-  const onCreateSubmit = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!newCategoryName.trim()) return;
-    const success = await createCategory(newCategoryName);
-    if (success) {
-      setNewCategoryName('');
-      setIsCreateModalOpen(false);
-    }
-  };
-
   const onStartEditing = (category: Category) => {
     setEditingId(category.id);
     setEditingName(category.name);
@@ -151,18 +140,16 @@ export const useCategoriesModel = () => {
     mostUsedCategoryName,
     categoryCounts,
 
-    newCategoryName,
     editingId,
     editingName,
     isCreateModalOpen,
     
-    setNewCategoryName,
     setEditingName,
     setIsCreateModalOpen,
-    onCreateSubmit,
     onStartEditing,
     onCancelEditing,
     onUpdateSubmit,
+    createCategory,
     deleteCategory,
     categoriesWithIcons,
   };

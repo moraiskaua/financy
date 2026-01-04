@@ -3,8 +3,8 @@ import { GET_CATEGORIES } from '@/graphql/categories.queries';
 import { GET_TRANSACTIONS } from '@/graphql/transactions.queries';
 import type { Category, Transaction, User } from '@/types';
 import {
-    getCategoryColor,
-    getCategoryIcon,
+  getCategoryColor,
+  getCategoryIcon,
 } from '@/utils/transaction-helpers';
 import { useQuery } from '@apollo/client/react';
 import { useMemo } from 'react';
@@ -37,8 +37,8 @@ export const useDashboardModel = () => {
   const { data: transactionsData, loading: transactionsLoading } = useQuery<{ transactions: Transaction[] }>(GET_TRANSACTIONS);
   const { data: categoriesData, loading: categoriesLoading } = useQuery<{ categories: Category[] }>(GET_CATEGORIES);
 
-  const transactions = transactionsData?.transactions || [];
-  const categories = categoriesData?.categories || [];
+  const transactions = useMemo(() => transactionsData?.transactions || [], [transactionsData]);
+  const categories = useMemo(() => categoriesData?.categories || [], [categoriesData]);
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
