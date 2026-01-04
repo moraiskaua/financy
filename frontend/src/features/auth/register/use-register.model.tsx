@@ -1,8 +1,8 @@
-import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { apolloClient } from '@/config/apollo-client';
 import { REGISTER_MUTATION } from '@/graphql/auth.queries';
 import type { RegisterInput } from '@/types';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const useRegisterModel = () => {
   const navigate = useNavigate();
