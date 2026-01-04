@@ -34,7 +34,7 @@ export function CreateTransactionDialogView({
 }: CreateTransactionDialogViewProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden bg-white">
+      <DialogContent className="p-0 overflow-hidden bg-white">
         <div className="p-6 pb-0">
           <div className="flex items-center justify-between mb-2">
             <DialogTitle className="text-xl font-bold text-gray-900">
@@ -57,7 +57,7 @@ export function CreateTransactionDialogView({
                 type="button"
                 onClick={() => setType('saida')}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg border transition-all",
+                  "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all shadow-sm",
                   type === 'saida'
                     ? "border-red-500 bg-red-50 text-red-600"
                     : "border-gray-200 text-gray-600 hover:bg-gray-50"
@@ -70,7 +70,7 @@ export function CreateTransactionDialogView({
                 type="button"
                 onClick={() => setType('entrada')}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg border transition-all",
+                  "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all shadow-sm",
                   type === 'entrada'
                     ? "border-green-500 bg-green-50 text-green-600"
                     : "border-gray-200 text-gray-600 hover:bg-gray-50"
@@ -124,11 +124,7 @@ export function CreateTransactionDialogView({
             )}
 
             <div className="pt-4 pb-6">
-              <Button
-                type="submit"
-                className="w-full bg-green-700 hover:bg-green-800 text-white py-6 text-base"
-                disabled={isLoading}
-              >
+              <Button type="submit" variant="primary" className="w-full py-6 text-base rounded-xl shadow-sm" disabled={isLoading}>
                 {isLoading ? 'Salvando...' : 'Salvar'}
               </Button>
             </div>

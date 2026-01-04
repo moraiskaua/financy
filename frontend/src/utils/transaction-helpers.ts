@@ -111,10 +111,10 @@ export function formatCurrency(value: number): string {
 
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
+  if (!dateString || isNaN(date.getTime())) return '-';
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
     month: '2-digit',
     year: '2-digit',
   }).format(date);
 }
-

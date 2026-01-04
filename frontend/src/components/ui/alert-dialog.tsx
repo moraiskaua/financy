@@ -1,7 +1,7 @@
-import { createContext, useContext, type ReactNode } from 'react';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from './dialog';
-import { Button } from './button';
 import { cn } from '@/utils/cn';
+import { createContext, useContext, type ReactNode } from 'react';
+import { Button } from './button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './dialog';
 
 const AlertDialogContext = createContext<{ onOpenChange: (open: boolean) => void } | null>(null);
 
@@ -31,11 +31,12 @@ export interface AlertDialogActionProps {
   children: ReactNode;
   onClick?: () => void;
   className?: string;
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
 }
 
-export function AlertDialogAction({ children, onClick, className }: AlertDialogActionProps) {
+export function AlertDialogAction({ children, onClick, className, variant = 'primary' }: AlertDialogActionProps) {
   return (
-    <Button onClick={onClick} className={cn(className)}>
+    <Button onClick={onClick} variant={variant} className={cn(className)}>
       {children}
     </Button>
   );

@@ -34,20 +34,23 @@ export function useCreateTransactionDialogModel({ onClose, onSuccess }: UseCreat
       setIsLoading(true);
       setError(null);
 
-      await createTransaction({
+      const success = await createTransaction({
         description,
         amount: parseFloat(amount),
         type,
         categoryId,
       });
 
-      setDescription('');
-      setAmount('');
-      setType('saida');
-      setCategoryId('');
-      
-      onSuccess?.();
-      onClose();
+      if (success) {
+        setDescription('');
+        setAmount('');
+        setType('saida');
+        setCategoryId('');
+        onSuccess?.();
+        onClose();
+      } else {
+        setError('Falha ao criar transação');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao criar transação');
     } finally {

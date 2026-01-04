@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogTitle
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/utils/cn';
@@ -33,11 +33,11 @@ const ICONS = [
 ];
 
 const COLORS = [
-  { name: 'green', class: 'bg-green-500' },
-  { name: 'blue', class: 'bg-blue-500' },
-  { name: 'purple', class: 'bg-purple-500' },
-  { name: 'pink', class: 'bg-pink-500' },
-  { name: 'red', class: 'bg-red-500' },
+  { name: 'green', class: 'bg-green-600' },
+  { name: 'blue', class: 'bg-blue-600' },
+  { name: 'purple', class: 'bg-purple-600' },
+  { name: 'pink', class: 'bg-pink-600' },
+  { name: 'red', class: 'bg-red-600' },
   { name: 'orange', class: 'bg-orange-500' },
   { name: 'yellow', class: 'bg-yellow-500' },
 ];
@@ -59,7 +59,7 @@ export function CreateCategoryDialogView({
 }: CreateCategoryDialogViewProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden bg-white max-h-[90vh] overflow-y-auto">
+      <DialogContent className="p-0 overflow-hidden bg-white max-h-[90vh] overflow-y-auto">
         <div className="p-6 pb-0">
           <div className="flex items-center justify-between mb-2">
             <DialogTitle className="text-xl font-bold text-gray-900">
@@ -77,26 +77,22 @@ export function CreateCategoryDialogView({
           </DialogDescription>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-700">Título</label>
-              <Input
-                placeholder="Ex. Alimentação"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="bg-white"
-              />
-            </div>
+            <Input
+              label="Título"
+              placeholder="Ex. Alimentação"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="bg-white"
+            />
 
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-700">Descrição</label>
-              <Input
-                placeholder="Descrição da categoria"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="bg-white"
-              />
-              <span className="text-xs text-gray-400">Opcional</span>
-            </div>
+            <Input
+              label="Descrição"
+              helper="Opcional"
+              placeholder="Descrição da categoria"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="bg-white"
+            />
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">Ícone</label>
@@ -107,10 +103,10 @@ export function CreateCategoryDialogView({
                     type="button"
                     onClick={() => setSelectedIcon(iconName)}
                     className={cn(
-                      "w-10 h-10 rounded-lg border flex items-center justify-center transition-all",
+                      "w-10 h-10 rounded-xl border flex items-center justify-center transition-all shadow-sm",
                       selectedIcon === iconName
-                        ? "border-green-600 bg-green-50 text-green-600"
-                        : "border-gray-200 text-gray-500 hover:bg-gray-50"
+                        ? "border-green-600 bg-green-50 text-green-700"
+                        : "border-gray-200 text-gray-600 hover:bg-gray-50"
                     )}
                   >
                     <Icon className="w-5 h-5" />
@@ -128,11 +124,11 @@ export function CreateCategoryDialogView({
                     type="button"
                     onClick={() => setSelectedColor(colorName)}
                     className={cn(
-                      "w-8 h-8 rounded-full transition-all ring-offset-2",
+                      "w-10 h-6 rounded-full transition-all ring-offset-2 shadow-sm",
                       bgClass,
                       selectedColor === colorName
-                        ? "ring-2 ring-gray-400 scale-110"
-                        : "hover:scale-105"
+                        ? "ring-2 ring-green-600 ring-offset-2 ring-offset-white"
+                        : "hover:opacity-90"
                     )}
                   />
                 ))}
@@ -146,11 +142,7 @@ export function CreateCategoryDialogView({
             )}
 
             <div className="pt-4 pb-6">
-              <Button
-                type="submit"
-                className="w-full bg-green-700 hover:bg-green-800 text-white py-6 text-base"
-                disabled={isLoading}
-              >
+              <Button type="submit" variant="primary" className="w-full py-6 text-base rounded-xl shadow-sm" disabled={isLoading}>
                 {isLoading ? 'Salvando...' : 'Salvar'}
               </Button>
             </div>

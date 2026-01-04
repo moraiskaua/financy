@@ -4,7 +4,7 @@ import { GET_TRANSACTIONS } from '@/graphql/transactions.queries';
 import type { Category, Transaction, User } from '@/types';
 import {
   getCategoryColor,
-  getCategoryIcon,
+  getIconByName,
 } from '@/utils/transaction-helpers';
 import { useQuery } from '@apollo/client/react';
 import { useMemo, useState } from 'react';
@@ -19,6 +19,7 @@ const iconBgClasses: Record<string, string> = {
   green: 'bg-green-light',
   pink: 'bg-pink-light',
   yellow: 'bg-yellow-light',
+  red: 'bg-red-light',
   gray: 'bg-gray-200',
 };
 
@@ -29,6 +30,7 @@ const iconColorClasses: Record<string, string> = {
   green: 'text-green-base',
   pink: 'text-pink-base',
   yellow: 'text-yellow-base',
+  red: 'text-red-base',
   gray: 'text-gray-600',
 };
 
@@ -73,17 +75,18 @@ export const useDashboardModel = () => {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, RECENT_TRANSACTIONS_LIMIT)
       .map((transaction) => {
-        const colorVariant = getCategoryColor(transaction.category.name);
+        const category = categories.find(c => c.id === transaction.categoryId);
+        const colorVariant = (category?.color as keyof typeof iconBgClasses) || getCategoryColor(transaction.category.name);
         return {
           ...transaction,
-          icon: getCategoryIcon(transaction.category.name),
+          icon: getIconByName(category?.icon || 'briefcase'),
           isIncome: transaction.type === 'entrada',
           colorVariant,
           iconBgClass: iconBgClasses[colorVariant] || iconBgClasses.gray,
           iconColorClass: iconColorClasses[colorVariant] || iconColorClasses.gray,
         };
       });
-  }, [transactions]);
+  }, [transactions, categories]);
 
   const categoriesWithStats = useMemo(() => {
     return categories
@@ -95,7 +98,7 @@ export const useDashboardModel = () => {
           ...category,
           count: categoryTransactions.length,
           total: categoryTransactions.reduce((sum, t) => sum + t.amount, 0),
-          colorVariant: getCategoryColor(category.name),
+          colorVariant: (category.color as keyof typeof iconBgClasses) || getCategoryColor(category.name),
         };
       })
       .filter((c) => c.count > 0)

@@ -26,7 +26,6 @@ export function useCreateCategoryDialogModel({ onClose, onSuccess }: UseCreateCa
       setIsLoading(true);
       setError(null);
 
-      // Note: Backend now accepts all fields.
       const success = await createCategory(name, description, selectedIcon, selectedColor);
       
       if (success) {

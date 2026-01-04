@@ -1,6 +1,6 @@
 import { useCategoriesModel } from '@/features/categories/use-categories.model';
 import type { Transaction } from '@/types';
-import { getCategoryColor, getCategoryIcon } from '@/utils/transaction-helpers';
+import { getCategoryColor, getIconByName } from '@/utils/transaction-helpers';
 import { useMemo, useState } from 'react';
 import { useTransactionsModel } from './use-transactions.model';
 
@@ -13,6 +13,7 @@ const iconBgClasses: Record<string, string> = {
   green: 'bg-green-light',
   pink: 'bg-pink-light',
   yellow: 'bg-yellow-light',
+  red: 'bg-red-light',
   gray: 'bg-gray-200',
 };
 
@@ -23,6 +24,7 @@ const iconColorClasses: Record<string, string> = {
   green: 'text-green-base',
   pink: 'text-pink-base',
   yellow: 'text-yellow-base',
+  red: 'text-red-base',
   gray: 'text-gray-600',
 };
 
@@ -33,6 +35,12 @@ export const useTransactionsPageModel = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('');
   const [filterCategory, setFilterCategory] = useState<string>('');
+  const [filterPeriod, setFilterPeriod] = useState<string>(() => {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    return `${y}-${m}`;
+  });
   const [currentPage, setCurrentPage] = useState(1);
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -64,6 +72,22 @@ export const useTransactionsPageModel = () => {
     })),
   ];
 
+  const periodOptions = useMemo(() => {
+    const now = new Date();
+    const res: { value: string; label: string }[] = [];
+    const months = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      res.push({ value: `${y}-${m}`, label: `${months[d.getMonth()]} / ${y}` });
+    }
+    return res;
+  }, []);
+
   const filteredTransactions = useMemo(() => {
     return transactionsModel.transactions
       .filter((transaction: Transaction) => {
@@ -73,7 +97,12 @@ export const useTransactionsPageModel = () => {
         const matchesType = !filterType || transaction.type === filterType;
         const matchesCategory =
           !filterCategory || transaction.categoryId === filterCategory;
-        return matchesSearch && matchesType && matchesCategory;
+        const d = new Date(transaction.createdAt);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const period = `${y}-${m}`;
+        const matchesPeriod = !filterPeriod || period === filterPeriod;
+        return matchesSearch && matchesType && matchesCategory && matchesPeriod;
       })
       .sort(
         (a, b) =>
@@ -84,6 +113,7 @@ export const useTransactionsPageModel = () => {
     searchQuery,
     filterType,
     filterCategory,
+    filterPeriod,
   ]);
 
   const paginatedTransactions = useMemo(() => {
@@ -92,14 +122,16 @@ export const useTransactionsPageModel = () => {
     const slice = filteredTransactions.slice(start, end);
     
     return slice.map(t => {
-      const categoryName = categoriesModel.categories.find(c => c.id === t.categoryId)?.name || 'Outros';
-      const color = getCategoryColor(categoryName);
+      const category = categoriesModel.categories.find(c => c.id === t.categoryId);
+      const categoryName = category?.name || 'Outros';
+      const color = (category?.color as keyof typeof iconBgClasses) || getCategoryColor(categoryName);
       return {
         ...t,
         categoryName,
-        Icon: getCategoryIcon(categoryName),
+        Icon: getIconByName(category?.icon || 'briefcase'),
         iconBgClass: iconBgClasses[color] || iconBgClasses.gray,
         iconColorClass: iconColorClasses[color] || iconColorClasses.gray,
+        colorVariant: color,
       };
     });
   }, [filteredTransactions, currentPage, categoriesModel.categories]);
@@ -140,6 +172,10 @@ export const useTransactionsPageModel = () => {
     setFilterCategory(value);
     handleFilterChange();
   };
+  const handlePeriodFilterChange = (value: string) => {
+    setFilterPeriod(value);
+    handleFilterChange();
+  };
 
   const resetForm = () => {
     setDescription('');
@@ -174,10 +210,24 @@ export const useTransactionsPageModel = () => {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Tem certeza que deseja excluir esta transação?')) {
-      await transactionsModel.deleteTransaction(id);
-    }
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const handleDelete = (id: string) => {
+    setDeleteId(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    await transactionsModel.deleteTransaction(deleteId);
+    setIsDeleteDialogOpen(false);
+    setDeleteId(null);
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+    setDeleteId(null);
   };
 
   return {
@@ -188,12 +238,15 @@ export const useTransactionsPageModel = () => {
     typeOptions,
     allTypeOptions,
     categoryOptions,
+    periodOptions,
     searchQuery,
     setSearchQuery,
     filterType,
     setFilterType,
     filterCategory,
     setFilterCategory,
+    filterPeriod,
+    setFilterPeriod,
     filteredTransactions,
     paginatedTransactions,
     totalPages,
@@ -221,8 +274,13 @@ export const useTransactionsPageModel = () => {
     handleSubmit,
     startEditing,
     handleDelete,
+    isDeleteDialogOpen,
+    setIsDeleteDialogOpen,
+    confirmDelete,
+    cancelDelete,
     handleSearchChange,
     handleTypeFilterChange,
     handleCategoryFilterChange,
+    handlePeriodFilterChange,
   };
 };

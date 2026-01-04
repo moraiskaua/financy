@@ -40,8 +40,7 @@ export function CategoriesView({
   const [deleteConfirmationId, setDeleteConfirmationId] = useState<string | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-  const handleEditClick = (category: any) => {
-    // Adapter for the category object if needed, but it should match
+  const handleEditClick = (category: Category) => {
     setEditingCategory(category);
   };
 

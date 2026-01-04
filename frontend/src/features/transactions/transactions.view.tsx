@@ -1,11 +1,12 @@
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { IconButton } from '@/components/ui/icon-button';
 import { Input } from '@/components/ui/input';
@@ -16,14 +17,14 @@ import { Type } from '@/components/ui/type';
 import { cn } from '@/utils/cn';
 import { formatCurrency, formatDate } from '@/utils/transaction-helpers';
 import {
-    ChevronLeft,
-    ChevronRight,
-    Edit,
-    Plus,
-    Search,
-    Trash2,
-    TrendingDown,
-    TrendingUp,
+  ChevronLeft,
+  ChevronRight,
+  Edit,
+  Plus,
+  Search,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
 } from 'lucide-react';
 import { CreateTransactionDialog } from './components/create-transaction-dialog';
 import type { useTransactionsPageModel } from './use-transactions-page.model';
@@ -36,9 +37,11 @@ export function TransactionsView({
   typeOptions,
   allTypeOptions,
   categoryOptions,
+  periodOptions,
   searchQuery,
   filterType,
   filterCategory,
+  filterPeriod,
   paginatedTransactions,
   totalPages,
   currentPage,
@@ -65,6 +68,11 @@ export function TransactionsView({
   handleSearchChange,
   handleTypeFilterChange,
   handleCategoryFilterChange,
+  handlePeriodFilterChange,
+  isDeleteDialogOpen,
+  setIsDeleteDialogOpen,
+  confirmDelete,
+  cancelDelete,
 }: TransactionsViewProps) {
 
   return (
@@ -116,12 +124,11 @@ export function TransactionsView({
             placeholder="Todas"
           />
           <Select
-            label="Ordenar por"
-            options={[{ value: 'date-desc', label: 'Mais recentes' }]}
-            value="date-desc"
-            onChange={() => {}}
-            placeholder="Mais recentes"
-            disabled
+            label="Período"
+            options={periodOptions}
+            value={filterPeriod}
+            onChange={handlePeriodFilterChange}
+            placeholder="Selecione"
           />
         </div>
       </div>
@@ -135,10 +142,13 @@ export function TransactionsView({
                   Descrição
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Data
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Categoria
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Data
+                  Tipo
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Valor
@@ -182,17 +192,19 @@ export function TransactionsView({
                           <p className="text-sm font-medium text-gray-900">
                             {transaction.description}
                           </p>
-                          <Type type={transaction.type as 'entrada' | 'saida'} />
                         </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Tag>{transaction.categoryName}</Tag>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
                         {formatDate(transaction.createdAt)}
                       </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Tag variant={transaction.colorVariant}>{transaction.categoryName}</Tag>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Type type={transaction.type as 'entrada' | 'saida'} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -209,7 +221,7 @@ export function TransactionsView({
                               : 'text-danger'
                           )}
                         >
-                          {formatCurrency(transaction.amount)}
+                          {(transaction.type === 'entrada' ? '+' : '-') + ' ' + formatCurrency(transaction.amount)}
                         </span>
                       </div>
                     </td>
@@ -338,6 +350,21 @@ export function TransactionsView({
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent className="p-0 overflow-hidden bg-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir transação</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Tem certeza que deseja excluir esta transação?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelDelete}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction variant="danger" onClick={confirmDelete}>Excluir</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

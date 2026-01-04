@@ -8,7 +8,7 @@ export default function HomeViewModel() {
     monthlyExpenses,
     recentTransactions,
     categoriesWithStats,
-    isLoading,
+    loading,
   } = useDashboardModel();
 
   return (
@@ -18,8 +18,7 @@ export default function HomeViewModel() {
       monthlyExpenses={monthlyExpenses}
       recentTransactions={recentTransactions}
       categoriesWithStats={categoriesWithStats}
-      isLoading={isLoading}
+      isLoading={loading}
     />
   );
 }
-

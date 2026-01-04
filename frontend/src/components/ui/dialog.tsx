@@ -27,9 +27,9 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
       className="fixed inset-0 z-50 flex items-center justify-center"
       onClick={() => onOpenChange(false)}
     >
-      <div className="fixed inset-0 bg-black/50" />
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
       <div
-        className="relative z-50 w-full max-w-lg mx-4 bg-white rounded-lg shadow-lg"
+        className="relative z-50 w-full sm:max-w-[400px] mx-4 bg-white rounded-2xl shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         {children}
@@ -111,4 +111,3 @@ export function DialogClose({ onClose, className }: DialogCloseProps) {
     </button>
   );
 }
-
