@@ -32,6 +32,18 @@ if [ ! -f "$DB_PATH" ]; then
   npx prisma db push --accept-data-loss
 
   echo "✅ Database created successfully"
+
+  # Run seed to populate with demo data
+  echo "🌱 Populating database with demo data..."
+  npm run seed:prod
+
+  if [ $? -eq 0 ]; then
+    echo "✅ Demo data loaded successfully"
+    echo "📧 Demo user created: demo@financy.com"
+    echo "🔑 Password: demo123"
+  else
+    echo "⚠️  Seed failed, but server will continue"
+  fi
 else
   echo "✅ Database already exists"
 fi

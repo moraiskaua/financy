@@ -163,7 +163,24 @@ docker-compose logs -f
 
 🎉 Pronto! A aplicação está rodando em containers Docker!
 
-#### 5. Comandos úteis do Docker
+#### 5. Credenciais de Acesso (Dados Demo)
+
+A aplicação já vem com dados de demonstração pré-carregados:
+
+```
+Email: demo@financy.com
+Senha: demo123
+```
+
+**O que está incluído nos dados demo:**
+- ✅ 1 usuário pronto para usar
+- ✅ 8 categorias pré-configuradas (Alimentação, Transporte, Mercado, Investimento, Entretenimento, Utilidades, Salário, Saúde)
+- ✅ 29 transações de exemplo dos últimos 35 dias
+- ✅ Exemplos de receitas e despesas variadas
+
+> **Nota**: Você também pode criar sua própria conta clicando em "Criar conta" na tela de login.
+
+#### 6. Comandos úteis do Docker
 ```bash
 # Parar os serviços
 docker-compose down
